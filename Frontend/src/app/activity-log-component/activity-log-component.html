@@ -1,0 +1,28 @@
+<div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+  <h3 class="text-base font-semibold text-slate-900 mb-4">Activités récentes</h3>
+
+  <div class="flex flex-col divide-y divide-slate-100">
+    <div *ngFor="let activite of activities" class="flex items-center justify-between py-3 first:pt-0 last:pb-0">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-full bg-[#3a7ca5] text-white text-xs font-semibold flex items-center justify-center shrink-0">
+          {{ activite.initiales }}
+        </div>
+        <div>
+          <p class="text-sm font-medium text-slate-900">{{ activite.texte }}</p>
+          <p class="text-xs text-slate-400">{{ activite.LocalDateTime| date: 'd MMM, HH:mm' }}</p>
+        </div>
+      </div>
+
+      <span
+        class="text-xs font-medium px-3 py-1 rounded-full shrink-0"
+        [ngClass]="{
+          'bg-green-100 text-green-700': activite.badge === 'Tache crée',
+          'bg-blue-100 text-blue-700': activite.badge === 'Tache modifiée',
+          'bg-indigo-100 text-indigo-700': activite.badge === 'Membre ajouté',
+          'bg-red-100 text-red-700': activite.badge === 'Membre retiré'
+        }">
+        {{ activite.badge }}
+      </span>
+    </div>
+  </div>
+</div>

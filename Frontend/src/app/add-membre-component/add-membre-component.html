@@ -1,0 +1,61 @@
+<!-- ajout-membre-modal.component.html -->
+<div *ngIf="isOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40" (click)="onFermer()">
+
+  <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-lg" (click)="$event.stopPropagation()">
+
+    <div class="mb-4 flex items-center justify-between">
+      <h3 class="text-base font-semibold text-gray-900">Ajouter des collaborateurs</h3>
+      <button (click)="onFermer()" class="text-gray-400 hover:text-gray-600">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="max-h-64 overflow-y-auto rounded-lg border border-gray-200">
+
+      <div *ngFor="let equipe of equipesFiltrees">
+        <div class="sticky top-0 bg-gray-50 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-gray-500">
+          {{ equipe.nom }}
+        </div>
+
+        <button *ngFor="let membre of equipe.members" type="button" (click)="toggleMembre(membre.id)"
+          [ngClass]="membresSelectionnes.has(membre.id) ? 'bg-blue-50' : 'hover:bg-gray-50'"
+          class="flex w-full items-center gap-3 border-b border-gray-100 px-3 py-2 text-left">
+          <span class="flex h-4 w-4 shrink-0 items-center justify-center rounded border-2"
+            [ngClass]="membresSelectionnes.has(membre.id) ? 'border-blue-600 bg-blue-600' : 'border-gray-300'">
+            <svg *ngIf="membresSelectionnes.has(membre.id)" xmlns="http://www.w3.org/2000/svg"
+              class="h-3 w-3 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+          </span>
+
+          <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-teal-600 text-[10px] font-semibold text-white">
+            {{ membre.nom.charAt(0) + membre.prenom.charAt(0) }}
+          </span>
+          <span class="flex-1 text-sm text-gray-800">{{ membre.nom }} {{ membre.prenom }}</span>
+        </button>
+
+        <p *ngIf="!equipe.members.length" class="px-3 py-2 text-sm text-gray-400">
+          Aucun membre disponible dans ce pôle.
+        </p>
+      </div>
+
+      <p *ngIf="!equipesFiltrees.length" class="px-3 py-2 text-sm text-gray-400">
+        Chargement des équipes...
+      </p>
+    </div>
+
+    <div class="mt-5 flex justify-end gap-3">
+      <button (click)="onFermer()"
+        class="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50">
+        Annuler
+      </button>
+      <button (click)="onConfirmer()" [disabled]="membresSelectionnes.size === 0"
+        class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed">
+        Ajouter ({{ membresSelectionnes.size }})
+      </button>
+    </div>
+
+  </div>
+</div>

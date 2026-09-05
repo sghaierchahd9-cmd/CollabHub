@@ -1,0 +1,57 @@
+<div *ngIf="isOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-8">
+  <div class="w-full max-w-md rounded-2xl bg-white shadow-2xl">
+
+    <div class="flex items-start justify-between border-b border-gray-100 px-6 py-5">
+      <div>
+        <h2 class="text-xl font-bold text-gray-900">Mettre à jour l'avancement</h2>
+        <p class="mt-1 text-sm text-gray-500">{{ tache?.titre }}</p>
+      </div>
+      <button type="button" class="rounded-lg p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+        aria-label="Fermer" (click)="fermerForm()">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="soumettre()" class="px-6 py-5">
+
+      <p *ngIf="erreurMessage" class="mb-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+        {{ erreurMessage }}
+      </p>
+
+      <div class="mb-2 flex items-center justify-between">
+        <label for="tauxAvancement" class="text-sm font-medium text-gray-700">Taux d'avancement</label>
+        <span class="text-lg font-bold text-[#3a7ca5]">{{ form.value.tauxAvancement }}%</span>
+      </div>
+
+      <input id="tauxAvancement" type="range" formControlName="tauxAvancement" min="0" max="100" step="5"
+        class="w-full accent-[#3a7ca5]" />
+
+      <div class="mt-2 flex justify-between text-xs text-gray-400">
+        <span>0%</span>
+        <span>50%</span>
+        <span>100%</span>
+      </div>
+
+      <p *ngIf="suggererTerminee" class="mt-3 rounded-lg bg-blue-50 px-3 py-2 text-xs text-blue-700">
+        Cette tâche est à 100% — pense à la passer en "Terminée" depuis le Kanban si c'est bien le cas.
+      </p>
+
+      <div class="mt-6 flex justify-end gap-3 border-t border-gray-100 pt-4">
+        <button type="button" (click)="fermerForm()" [disabled]="enregistrementEnCours"
+          class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50">
+          Annuler
+        </button>
+        <button type="submit" [disabled]="enregistrementEnCours"
+          class="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60">
+          <svg *ngIf="enregistrementEnCours" class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+          </svg>
+          {{ enregistrementEnCours ? 'Enregistrement...' : 'Enregistrer' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

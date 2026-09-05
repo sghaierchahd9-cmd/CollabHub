@@ -1,0 +1,29 @@
+<div *ngIf="isOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-8">
+  <div class="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white shadow-2xl">
+
+    <div class="sticky top-0 z-10 flex items-start justify-between border-b border-gray-100 bg-white px-6 py-5">
+      <div>
+        <h2 class="text-xl font-bold text-gray-900">{{ tache?.titre }}</h2>
+        <p class="mt-1 text-sm text-gray-500">{{ tache?.description }}</p>
+      </div>
+      <button type="button" class="rounded-lg p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+        aria-label="Fermer" (click)="fermerModal()">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="px-6 py-5">
+      <h3 class="mb-3 text-sm font-semibold text-gray-700">Commentaires</h3>
+     <app-commentaires-component
+  [commentaires]="commentaires"
+  [membresProjet]="membresProjet"
+  [chargementEnCours]="chargementCommentaires"
+  (ajouterCommentaire)="onAjouterCommentaire($event)"
+  (modifierCommentaire)="onModifierCommentaire($event)"
+  (supprimerCommentaire)="onSupprimerCommentaire($event)">
+</app-commentaires-component>
+    </div>
+  </div>
+</div>

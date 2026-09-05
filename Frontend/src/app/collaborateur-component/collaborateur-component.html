@@ -1,0 +1,145 @@
+
+<div class="flex-1 flex flex-col h-screen overflow-hidden">
+  <app-header-component
+    [title]="'Collaborateurs'"
+    [subtitle]="'Voir tous les membres'"
+    [actionButtonText]="connectedUser?.role === 'ADMINISTRATEUR' ? 'Collaborateur' : ''" (clickedbutton)="onClickedButton($event)" [ajout]="true">
+  </app-header-component>
+
+  <div class="flex-1 overflow-y-auto p-4 md:p-6 bg-[#EDEEF7] w-full border border-[#e2eaf0]">
+
+    <!-- Stat cards : responsive -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4 mb-6">
+      <app-stat-cart-component *ngFor="let carte of statCartes" [carte]="carte"></app-stat-cart-component>
+    </div>
+
+    <!-- Filtres -->
+    <div class="flex gap-2 mb-5 flex-wrap">
+      <button *ngFor="let filtre of Filtres" (click)="selectFiltre(filtre)"
+        class="px-4 py-1.5 rounded-full border-[1.5px] text-[13px] font-['Inter',sans-serif] cursor-pointer whitespace-nowrap"
+        [ngClass]="selectedFiltre === filtre
+          ? 'bg-[#3a7ca5] border-[#3a7ca5] text-white font-semibold'
+          : 'bg-white border-[#d4dfe8] text-[#6b7f8e] font-normal'">
+        {{ filtre }}
+      </button>
+    </div>
+
+    <!-- ========== VUE PLATE : tous / Chef de projet / Collaborateur ========== -->
+    <div  class="bg-white rounded-xl border border-[#e2eaf0] overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full border-collapse min-w-[640px]">
+          <thead>
+            <tr class="bg-[#f4f6f9]">
+              <th class="px-4 py-3 text-left text-[11px] font-semibold text-[#6b7f8e] tracking-wide uppercase">Membre</th>
+              <th class="px-4 py-3 text-left text-[11px] font-semibold text-[#6b7f8e] tracking-wide uppercase">Rôle</th>
+              <th class="px-4 py-3 text-left text-[11px] font-semibold text-[#6b7f8e] tracking-wide uppercase">Email</th>
+              <th class="hidden sm:table-cell px-4 py-3 text-left text-[11px] font-semibold text-[#6b7f8e] tracking-wide uppercase">Projets</th>
+              <th class="hidden md:table-cell px-4 py-3 text-left text-[11px] font-semibold text-[#6b7f8e] tracking-wide uppercase">Tâches</th>
+              <th class="px-4 py-3"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let membre of filtredresult; let last = last"
+                [class.border-t]="!last" class="border-[#e2eaf0]">
+              <ng-container *ngTemplateOutlet="ligneMembre; context: { $implicit: membre }"></ng-container>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+   
+
+    <!-- ========== TEMPLATE PARTAGÉ D'UNE LIGNE MEMBRE (DRY) ========== -->
+    <ng-template #ligneMembre let-membre>
+      <td class="px-4 py-3.5">
+        <div class="flex items-center gap-2.5">
+          <app-avatar-component
+              [nom]="membre.nom"
+              [prenom]="membre.prenom"
+              [photoProfilUrl]="membre.photoProfilUrl ?? null"
+              taille="md"
+            />
+          <span class="font-semibold text-[14px] text-[#0f1923] truncate">{{ membre.nom }} {{ membre.prenom }}</span>
+        </div>
+      </td>
+      <td class="px-4 py-3.5">
+        <span class="rounded-full px-2.5 py-0.5 text-[12px] font-semibold whitespace-nowrap"
+              [ngClass]="getRoleBadgeClass(membre.role)">
+          {{ getRoleLabel(membre.role) }}
+        </span>
+      </td>
+      <td class="px-4 py-3.5 text-[#6b7f8e] text-[13px] truncate max-w-[180px]">{{ membre.email }}</td>
+      <td class="hidden sm:table-cell px-4 py-3.5 font-semibold text-[14px] text-[#0f1923]">{{ membre.nbProjets }}</td>
+      <td class="hidden md:table-cell px-4 py-3.5 font-semibold text-[14px] text-[#0f1923]">{{ membre.nbTaches }}</td>
+      <td class="px-4 py-3.5">
+        <button *ngIf="connectedUser?.role === 'ADMINISTRATEUR'" (click)="voir(membre)"
+          class="bg-[#f4f6f9] border border-[#d4dfe8] rounded-md px-3 py-1.5 text-[12px] text-[#3a7ca5] font-semibold cursor-pointer whitespace-nowrap">
+          Voir
+        </button>
+      </td>
+    </ng-template>
+
+  </div>
+</div>
+
+<app-collaborateur-details-component
+  [collaborateurId]="selectedMembreId"
+  (close)="selectedMembreId = null"
+  (supprimer)="onSupprimerCollaborateur($event)">
+</app-collaborateur-details-component>
+
+<app-add-collaborateur-form [enCours]="enCoursCreation" [equipes]="equipes" [erreur]="erreurCreation"
+  [succes]="creationReussie" [isOpen]="afficherFormAjout" (soumettre)="onSoumettreCollaborateur($event)"
+  (close)="onFermerFormAjout()">
+</app-add-collaborateur-form>
+
+<div *ngIf="visible" class="fixed inset-0 z-[60] flex items-center justify-center px-4">
+
+  <!-- Backdrop -->
+  <div class="fixed inset-0 bg-slate-900/40" (click)="onCancel()"></div>
+
+  <!-- Modal -->
+  <div class="relative bg-white rounded-2xl shadow-xl w-full max-w-sm px-6 py-6 sm:px-7 sm:py-7 flex flex-col items-center text-center">
+
+    <div class="w-14 h-14 rounded-full bg-red-50 border border-red-100 flex items-center justify-center mb-4">
+      <svg width="22" height="22" viewBox="0 0 15 15" fill="none">
+        <path d="M2 4h11M5 4V2.5a.5.5 0 01.5-.5h4a.5.5 0 01.5.5V4M6 7v4M9 7v4M3 4l.8 8.5A1 1 0 004.8 13.5h5.4a1 1 0 001-.9L12 4"
+              stroke="#dc2626" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+
+    <h2 class="font-sans font-bold text-lg text-slate-900 mb-2">
+      Supprimer le collaborateur ?
+    </h2>
+
+    <p class="text-sm text-slate-500 mb-4">
+      Vous êtes sur le point de supprimer <strong class="text-slate-900 font-semibold">{{ selectedMembre?.nom }} {{ selectedMembre?.prenom }}</strong> de la plateforme.
+    </p>
+
+    <div class="w-full flex items-start gap-2 bg-red-50 border border-red-100 rounded-lg px-3.5 py-3 mb-6 text-left">
+      <span class="text-amber-500 text-sm shrink-0 mt-0.5">⚠️</span>
+      <p class="text-[13px] text-red-700 leading-snug">
+        Cette action est irréversible. Toutes les tâches assignées seront désaffectées.
+      </p>
+    </div>
+
+    <div class="w-full flex gap-3">
+      <button (click)="onCancel()"
+              class="flex-1 py-2.5 rounded-xl border border-slate-200 text-slate-700 font-semibold text-sm hover:bg-slate-50 transition-colors">
+        Annuler
+      </button>
+      <button (click)="onConfirm()"
+             [disabled]="isDeleting"
+              class="flex-1 py-2.5 rounded-xl bg-red-500 hover:bg-red-600 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold text-sm flex items-center justify-center gap-2 transition-colors">
+          <svg width="20" height="16"  viewBox="0 2 10 15" fill="none">
+          <path d="M2 4h11M5 4V2.5a.5.5 0 01.5-.5h4a.5.5 0 01.5.5V4M6 7v4M9 7v4M3 4l.8 8.5A1 1 0 004.8 13.5h5.4a1 1 0 001-.9L12 4"
+                stroke="white" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        {{ isDeleting ? 'Suppression...' : 'Confirmer la suppression' }}
+      </button>
+
+    </div>
+
+  </div>
+</div>

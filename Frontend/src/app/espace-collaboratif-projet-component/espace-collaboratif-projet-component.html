@@ -1,0 +1,11 @@
+<div class="rounded-2xl bg-white shadow-sm border border-gray-100 px-6 py-5">
+  <h3 class="mb-3 text-sm font-semibold text-gray-700">Espace collaboratif du projet</h3>
+  <app-commentaires-component
+    [commentaires]="commentaires"
+    [membresProjet]="membresProjet"
+    [chargementEnCours]="chargementCommentaires"
+    (ajouterCommentaire)="onAjouterCommentaire($event)"
+    (modifierCommentaire)="onModifierCommentaire($event)"
+    (supprimerCommentaire)="onSupprimerCommentaire($event)">
+  </app-commentaires-component>
+</div>

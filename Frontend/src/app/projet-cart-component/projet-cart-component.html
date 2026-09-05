@@ -1,0 +1,55 @@
+<div class="bg-white h-full rounded-xl p-5 border border-[#e2eaf0] flex flex-col gap-3.5 cursor-pointer transition-all duration-200 shadow-none hover:shadow-md ">
+  
+  <!-- Header: titre + badge statut -->
+  <div class="flex justify-between items-start gap-2">
+    <h3 class="m-0 font-['Plus_Jakarta_Sans',sans-serif] font-bold text-[15px] text-[#0f1923] leading-[1.3]">
+      {{projet?.nom}}
+    </h3>
+    
+  </div>
+
+  <!-- Description -->
+  <p class="m-0 text-[#6b7f8e] text-[13px] leading-[1.5]">
+    {{projet?.description}}
+  </p>
+
+  <!-- Meta: échéance + catégorie -->
+  <div class="flex items-center gap-4">
+    <span class="text-[#6b7f8e] text-xs flex items-center gap-1">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+        <rect x="1" y="2.5" width="11" height="10" rx="2" stroke="currentColor" stroke-width="1.2"/>
+        <path d="M4 1v3M9 1v3M1 6h11" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+      </svg>
+        Date d'échéance : {{ projet?.dateFinPrevue| date:'dd/MM/yyyy' }}
+    </span>
+  </div>
+
+  <!-- Barre de progression -->
+  <div>
+    <div class="h-1.5 bg-[#e8eef3] rounded-full overflow-hidden">
+      <div class="h-full  bg-[#3a7ca5] rounded-full" [ngStyle]="{ 'width.%': avancement }"></div>
+    </div>
+  </div>
+
+  <!--  avatars + pourcentage -->
+  <div class="flex items-center justify-between">
+    <div class="flex">
+     <div
+    *ngFor="let member of members; let i = index"
+    [class.ml-0]="i === 0"
+    [class.-ml-2]="i !== 0"
+  >
+        <div class="w-[26px] h-[26px] rounded-full bg-[#9C9CA1] text-white flex items-center justify-center text-[9.36px] font-semibold border-2 border-white shrink-0">
+          {{ (member.prenom?.charAt(0) ?? '') + (member.nom?.charAt(0) ?? '') }}
+        </div>
+      </div>
+ 
+      
+    </div>
+    <span class="{{statutDesign}}">
+      {{projet?.statut}}
+    </span>
+   
+  </div>
+
+</div>

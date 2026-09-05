@@ -1,0 +1,122 @@
+
+<div
+  *ngIf="sidebarState.isOpen()"
+  class="fixed inset-0 bg-black/40 z-40 md:hidden"
+  (click)="sidebarState.close()">
+</div>
+<aside class="w-[220px] shrink-0 bg-[#16425b] flex flex-col min-h-screen
+         fixed md:sticky top-0 left-0 z-50
+         transition-transform duration-200 ease-in-out
+         md:translate-x-0"
+  [ngClass]="sidebarState.isOpen() ? 'translate-x-0' : '-translate-x-full'">
+  
+  <!-- Logo -->
+  <div class="px-5 pt-7 pb-5 border-b border-white/[0.08]">
+   <div class="flex items-center gap-2">
+  <svg viewBox="0 0 180 180" class="w-8 h-8" fill="none">
+    <path d="M45 90 L75 120 L135 52.5" stroke="#6FD4B8" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="45" cy="90" r="16" fill="#F4F6F8"/>
+    <circle cx="75" cy="120" r="16" fill="#F4F6F8"/>
+    <circle cx="135" cy="52.5" r="16" fill="#F4F6F8"/>
+  </svg>
+  <span class="text-xl font-bold text-white">CollabHub</span>
+</div>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="p-2.5 pt-4 flex-1">
+    <p class="text-[10px] font-semibold tracking-[1.2px] uppercase px-2.5 mb-2 text-[#b4d2e1]/50">
+      Menu
+    </p>
+
+    <!-- home -->
+    <button routerLink="/home" [routerLinkActive]="activeClass" class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg mb-0.5 hover:bg-[#3a7ca5]/80 text-[#b4d2e1]/75 font-['Inter',sans-serif] font-semibold text-sm text-left transition-colors duration-150">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <rect x="1" y="8" width="3" height="7" rx="1" fill="#fff" />
+        <rect x="6" y="5" width="3" height="10" rx="1" fill="#fff" />
+        <rect x="11" y="2" width="3" height="13" rx="1" fill="#fff" />
+      </svg>
+      Tableau de bord
+    </button>
+
+    <!-- projets -->
+    <button routerLink="/projets" [routerLinkActive]="activeClass" class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg mb-0.5  text-[#b4d2e1]/75 font-['Inter',sans-serif] hover:bg-[#3a7ca5]/80 font-normal text-sm text-left transition-colors duration-150 ">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M1 4a1 1 0 011-1h4l1.5 2H14a1 1 0 011 1v7a1 1 0 01-1 1H2a1 1 0 01-1-1V4z" fill="rgba(180,210,225,0.65)" />
+      </svg>
+      Projets
+    </button>
+ <!-- Collaborateurs -->
+    <button routerLink="/membres" [routerLinkActive]="activeClass" class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg mb-0.5  text-[#b4d2e1]/75 hover:bg-[#3a7ca5]/80 font-['Inter',sans-serif] font-normal text-sm text-left transition-colors duration-150 ">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <circle cx="6" cy="5" r="3" fill="rgba(180,210,225,0.65)" />
+        <path d="M1 14c0-2.8 2.2-5 5-5s5 2.2 5 5" stroke="rgba(180,210,225,0.65)" stroke-width="1.5" stroke-linecap="round" />
+        <circle cx="12" cy="5" r="2" fill="rgba(180,210,225,0.65)" fill-opacity="0.6" />
+        <path d="M12 10c1.7.4 3 1.9 3 3.5" stroke="rgba(180,210,225,0.65)" stroke-width="1.5" stroke-linecap="round" />
+      </svg>
+      Collaborateurs
+    </button>
+    <!--Poles-->
+    <button routerLink="/poles" [routerLinkActive]="activeClass" class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg mb-0.5 hover:bg-[#3a7ca5]/80 text-[#b4d2e1]/75 font-['Inter',sans-serif] font-normal text-sm text-left transition-colors duration-150 ">
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+    <rect x="1" y="1" width="6" height="6" rx="1.5" fill="rgba(180,210,225,0.65)" />
+    <rect x="9" y="1" width="6" height="6" rx="1.5" fill="rgba(180,210,225,0.65)" />
+    <rect x="1" y="9" width="6" height="6" rx="1.5" fill="rgba(180,210,225,0.65)" />
+    <rect x="9" y="9" width="6" height="6" rx="1.5" fill="rgba(180,210,225,0.65)" />
+  </svg>
+  Pôles
+</button>
+
+    <button routerLink="/taches" [routerLinkActive]="activeClass" class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg mb-0.5 hover:bg-[#3a7ca5]/80 text-[#b4d2e1]/75 font-['Inter',sans-serif] font-normal text-sm text-left transition-colors duration-150 ">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <rect x="1" y="1" width="14" height="14" rx="3" stroke="rgba(180,210,225,0.65)" stroke-width="1.5" />
+        <path d="M4.5 8l2 2 4-4" stroke="rgba(180,210,225,0.65)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+      Tâches
+    </button>
+
+    <p class="text-[10px] font-semibold tracking-[1.2px] uppercase px-2.5 mt-6 mb-2 text-[#b4d2e1]/50">
+      Compte
+    </p>
+
+    <button routerLink="/parametres" [routerLinkActive]="activeClass" class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg  text-[#b4d2e1]/75 hover:bg-[#3a7ca5]/80 font-['Inter',sans-serif] text-sm text-left transition-colors duration-150 ">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <circle cx="8" cy="8" r="2.5" stroke="rgba(180,210,225,0.65)" stroke-width="1.5" />
+        <path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.41 1.41M11.54 11.54l1.41 1.41M3.05 12.95l1.41-1.41M11.54 4.46l1.41-1.41"
+          stroke="rgba(180,210,225,0.65)" stroke-width="1.5" stroke-linecap="round" />
+      </svg>
+      Paramètres
+    </button>
+  </nav>
+
+   <!-- Profil utilisateur + Déconnexion -->
+  <div class="border-t border-white/[0.08] p-2.5">
+    <div class="flex items-center gap-2.5 px-2.5 py-2 mb-1">
+       <app-avatar-component
+            [nom]="LoggedInUser?.nom ?? ''"
+            [prenom]="LoggedInUser?.prenom ?? ''"
+            [photoProfilUrl]="LoggedInUser?.photoProfilUrl ?? null"
+            taille="lg"
+          />
+      <div class="min-w-0">
+        <p class="m-0 text-white font-semibold text-[13px] truncate">{{LoggedInUser?.nom}} {{LoggedInUser?.prenom}}</p>
+        <p class="m-0 text-[#b4d2e1]/60 text-[11px]">{{LoggedInUser?.role}}</p>
+      </div>
+    </div>
+
+    <button
+      (click)="demanderDeconnexion()"
+      class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-red-400 hover:bg-red-500/10 font-['Inter',sans-serif] font-semibold text-sm text-left transition-colors duration-150"
+    >
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M6 2H3a1 1 0 00-1 1v10a1 1 0 001 1h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M10.5 11l3-3-3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M13.5 8H6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+      Déconnexion
+    </button>
+  </div>
+
+
+  
+</aside>

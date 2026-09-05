@@ -1,0 +1,41 @@
+<div class="fixed inset-0 bg-black/40 flex items-center justify-center z-50" (click)="onClose()">
+  <div class="bg-white rounded-2xl w-full max-w-md p-6" (click)="$event.stopPropagation()">
+
+    <div class="flex justify-between items-start mb-4">
+      <div class="flex items-center gap-3">
+        <div class="w-11 h-11 rounded-full bg-[#3a7ca5] text-white flex items-center justify-center font-semibold">
+          {{ membre.nom.charAt(0) + membre.prenom.charAt(0) }}
+        </div>
+        <div>
+          <p class="m-0 font-bold text-[#0f1923]">{{ membre.nom }} {{ membre.prenom }}</p>
+          <p class="m-0 text-xs text-[#6b7f8e]">{{ membre.email }}</p>
+        </div>
+      </div>
+      <button (click)="onClose()" class="text-slate-400 hover:text-slate-600">✕</button>
+    </div>
+
+    <div class="mb-4">
+      <div class="flex justify-between text-xs text-[#6b7f8e] mb-1">
+        <span>Progression</span>
+        <span>{{ nbTerminees }}/{{ taches.length }} tâches</span>
+      </div>
+      <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+        <div class="h-full bg-[#3a7ca5]" [style.width.%]="progression"></div>
+      </div>
+    </div>
+
+    <div class="space-y-2 max-h-80 overflow-y-auto">
+      <div *ngFor="let t of taches" class="flex items-center justify-between bg-[#f4f6f9] rounded-lg px-3 py-2.5">
+        <p class="m-0 text-sm text-[#0f1923]">{{ t.titre }}</p>
+        <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full" [ngClass]="statutColors[t.statut]">
+          {{ statutLabels[t.statut] }}
+        </span>
+      </div>
+
+      <p *ngIf="taches.length === 0" class="text-sm text-[#6b7f8e] text-center py-4">
+        Aucune tâche assignée sur ce projet.
+      </p>
+    </div>
+
+  </div>
+</div>

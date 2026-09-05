@@ -1,0 +1,24 @@
+
+
+
+<div class="flex-1 flex flex-col h-screen overflow-hidden">
+    <!-- Header -->
+
+<app-header-component [title]="'Tableau de bord'" [subtitle]="'Vue globale des statistiques de la plateforme'"></app-header-component>
+<!--content-->
+<div class="flex-1 overflow-y-auto p-6 bg-[#EDEEF7]  w-full  border border-[#e2eaf0]">
+<!-- Content :stats-->
+ <div class="grid gap-3 mt-5 [grid-template-columns:repeat(auto-fit,minmax(140px,1fr))]">
+<app-stat-cart-component *ngFor="let carte of cartes" [carte]="carte"></app-stat-cart-component></div>
+<div class="grid grid-cols-2 mb-8 mt-6 gap-3 " >
+<app-monthly-stats-component [data]="stasts"></app-monthly-stats-component>
+<app-repartition-tache-chart-component [labels]="labelsChart" [colors]="colorsChart" [Data]="dataChart" [title]="'Projets par statut'"></app-repartition-tache-chart-component>
+<app-equipes-list-component [equipes]="equipes"></app-equipes-list-component>
+
+
+</div>
+
+
+
+</div>
+</div>

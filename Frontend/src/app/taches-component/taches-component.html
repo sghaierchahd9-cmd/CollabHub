@@ -1,0 +1,14 @@
+
+
+<!--header-->
+<div class="flex-1 flex flex-col h-screen overflow-hidden">
+<app-header-component [title]="'Taches'" [subtitle]="'Tous les taches'"> </app-header-component>
+<!--Contenu-->
+<div class="flex-1 overflow-y-auto p-6 bg-[#EDEEF7]  w-full  border border-[#e2eaf0]">
+    <!--stats-->
+<div class="grid grid-cols-5 gap-4 mb-6">
+    <app-stat-cart-component *ngFor="let carte of cartes" [carte]="carte"></app-stat-cart-component>
+</div >
+<app-kanban-component (drop)="statchange()" [taches]="taches" (selectedTache)="selectTache($event)"></app-kanban-component>
+</div>
+</div>

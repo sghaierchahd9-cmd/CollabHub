@@ -1,0 +1,135 @@
+<div class="flex-1 flex flex-col h-screen overflow-hidden">
+  <app-header-component
+    [title]="'Pôles'"
+    [subtitle]="'Gérer les équipes transversales'"
+    [actionButtonText]="estAdmin ? 'Pôle' : ''"
+    (clickedbutton)="ouvrirCreation()"
+    [ajout]="true">
+  </app-header-component>
+
+  <div class="flex-1 overflow-y-auto p-4 md:p-6 bg-[#EDEEF7] w-full">
+    <div class="flex flex-col gap-6">
+      <div *ngFor="let equipe of equipes" class="bg-white rounded-xl border border-[#e2eaf0] overflow-hidden">
+
+        <div class="px-4 py-3 bg-[#f4f6f9] border-b border-[#e2eaf0] flex items-center justify-between">
+          <div>
+            <h3 class="text-[14px] font-semibold text-[#0f1923]">{{ equipe.nom }}</h3>
+            <p class="text-[12px] text-[#6b7f8e]" *ngIf="equipe.description">{{ equipe.description }}</p>
+          </div>
+          <div class="flex gap-2" *ngIf="estAdmin">
+            <button (click)="ouvrirAjoutMembre(equipe)"
+              class="px-3 py-1.5 rounded-md text-[12px] font-semibold bg-[#3a7ca5] text-white">
+              + Membre
+            </button>
+            <button (click)="ouvrirEdition(equipe)"
+              class="px-3 py-1.5 rounded-md text-[12px] font-semibold bg-[#f4f6f9] border border-[#d4dfe8] text-[#3a7ca5]">
+              Modifier
+            </button>
+            <button (click)="demanderSuppressionPole(equipe)"
+              class="px-3 py-1.5 rounded-md text-[12px] font-semibold bg-red-50 border border-red-100 text-red-600">
+              Supprimer
+            </button>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full border-collapse min-w-[640px]">
+            <thead>
+              <tr class="bg-[#f4f6f9]">
+                <th class="px-4 py-3 text-left text-[11px] font-semibold text-[#6b7f8e] uppercase">Membre</th>
+                <th class="px-4 py-3 text-left text-[11px] font-semibold text-[#6b7f8e] uppercase">Rôle</th>
+                <th class="px-4 py-3 text-left text-[11px] font-semibold text-[#6b7f8e] uppercase">Email</th>
+                <th class="px-4 py-3"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let membre of equipe.members; let last = last" [class.border-t]="!last" class="border-[#e2eaf0]">
+                <td class="px-4 py-3.5">
+                  <div class="flex items-center gap-2.5">
+                   <app-avatar-component
+                      [nom]="membre.nom"
+                      [prenom]="membre.prenom"
+                      [photoProfilUrl]="membre.photoProfilUrl ?? null"
+                      [taille]="'md'">
+                    </app-avatar-component>
+                    <span class="font-semibold text-[14px] text-[#0f1923]">{{ membre.nom }} {{ membre.prenom }}</span>
+                  </div>
+                </td>
+                <td class="px-4 py-3.5 text-[13px] text-[#6b7f8e]">{{ membre.role }}</td>
+                <td class="px-4 py-3.5 text-[13px] text-[#6b7f8e]">{{ membre.email }}</td>
+                <td class="px-4 py-3.5">
+                  <button *ngIf="estAdmin" (click)="demanderRetraitMembre(equipe, membre)"
+                    class="text-[12px] font-semibold text-red-600">
+                    Retirer
+                  </button>
+                </td>
+              </tr>
+              <tr *ngIf="!equipe.members || equipe.members.length === 0">
+                <td colspan="4" class="px-4 py-4 text-center text-[13px] text-[#6b7f8e]">Aucun membre dans ce pôle</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div *ngIf="equipes.length === 0" class="text-center text-[13px] text-[#6b7f8e] py-10">
+        Aucun pôle pour l'instant.
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-pole-form-modal-component
+  [isOpen]="afficherFormPole"
+  [pole]="poleEnEdition"
+  [enCours]="enCoursSoumission"
+  [erreur]="erreurSoumission"
+  (soumettre)="onSoumettrePole($event)"
+  (close)="onFermerFormPole()">
+</app-pole-form-modal-component>
+
+<app-ajouter-membre-pole-modal-component
+  [isOpen]="afficherAjoutMembre"
+  [utilisateursEligibles]="poleCibleAjout ? membresEligibles(poleCibleAjout) : []"
+  [enCours]="enCoursAjoutMembre"
+  [erreur]="erreurAjoutMembre"
+  (soumettre)="onSoumettreAjoutMembre($event)"
+  (close)="onFermerAjoutMembre()">
+</app-ajouter-membre-pole-modal-component>
+
+<!-- confirmation suppression pôle -->
+<div *ngIf="suppressionPoleVisible" class="fixed inset-0 z-[60] flex items-center justify-center px-4">
+  <div class="fixed inset-0 bg-slate-900/40" (click)="annulerSuppressionPole()"></div>
+  <div class="relative bg-white rounded-2xl shadow-xl w-full max-w-sm px-6 py-6 text-center">
+    <h2 class="font-bold text-lg text-slate-900 mb-2">Supprimer le pôle ?</h2>
+    <p class="text-sm text-slate-500 mb-6">
+      Le pôle <strong>{{ poleASupprimer?.nom }}</strong> sera supprimé. Les membres ne seront plus rattachés à ce pôle.
+    </p>
+    <div class="flex gap-3">
+      <button (click)="annulerSuppressionPole()" class="flex-1 py-2.5 rounded-xl border border-slate-200 text-slate-700 font-semibold text-sm">Annuler</button>
+      <button (click)="confirmerSuppressionPole()" [disabled]="enCoursSuppression"
+        class="flex-1 py-2.5 rounded-xl bg-red-500 text-white font-semibold text-sm disabled:opacity-60">
+        {{ enCoursSuppression ? 'Suppression...' : 'Confirmer' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- confirmation retrait membre -->
+<div *ngIf="suppressionMembreVisible" class="fixed inset-0 z-[60] flex items-center justify-center px-4">
+  <div class="fixed inset-0 bg-slate-900/40" (click)="annulerRetraitMembre()"></div>
+  <div class="relative bg-white rounded-2xl shadow-xl w-full max-w-sm px-6 py-6 text-center">
+    <h2 class="font-bold text-lg text-slate-900 mb-2">Retirer ce membre ?</h2>
+    <p class="text-sm text-slate-500 mb-6">
+      <strong>{{ membreASupprimer?.membre?.nom }} {{ membreASupprimer?.membre?.prenom }}</strong>
+      sera retiré du pôle <strong>{{ membreASupprimer?.equipe?.nom }}</strong>.
+    </p>
+    <div class="flex gap-3">
+      <button (click)="annulerRetraitMembre()" class="flex-1 py-2.5 rounded-xl border border-slate-200 text-slate-700 font-semibold text-sm">Annuler</button>
+      <button (click)="confirmerRetraitMembre()" [disabled]="enCoursSuppression"
+        class="flex-1 py-2.5 rounded-xl bg-red-500 text-white font-semibold text-sm disabled:opacity-60">
+        {{ enCoursSuppression ? 'Retrait...' : 'Confirmer' }}
+      </button>
+    </div>
+  </div>
+</div>

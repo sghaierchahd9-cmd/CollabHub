@@ -1,0 +1,8 @@
+  <div class="fixed top-4 right-4 z-50 flex flex-col gap-3">
+      @for (toast of toasts; track toast.id) {
+        <app-toast-notification-item-component
+          [notification]="toast"
+          (dismiss)="onDismiss($event)"
+          (clicked)="onClicked($event)" />
+      }
+    </div>

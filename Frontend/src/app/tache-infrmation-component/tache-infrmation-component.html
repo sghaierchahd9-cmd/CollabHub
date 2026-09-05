@@ -1,0 +1,99 @@
+<div class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+<div class="bg-white rounded-2xl w-[520px] max-w-[95vw] shadow-2xl overflow-hidden">
+
+  <!-- Header -->
+  <div class="px-6 pt-5 pb-4 border-b border-slate-200 flex justify-between items-center">
+    <div>
+      <h2 class="text-[17px] font-bold text-slate-900">Détails de la tâche</h2>
+      <p class="text-xs text-slate-500 mt-0.5">Consultation des informations</p>
+    </div>
+    <button type="button" (click)="onClose()" class="text-slate-500 hover:bg-slate-100 rounded-md p-1">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="px-6 py-5 flex flex-col gap-4 max-h-[65vh] overflow-y-auto">
+
+    <!-- Titre -->
+    <div>
+      <label class="text-xs font-semibold text-slate-600 mb-1.5 block tracking-wide">TITRE DE LA TÂCHE</label>
+      <p class="text-sm text-slate-900 font-medium px-3 py-2 rounded-lg bg-slate-50 border border-slate-200">
+        {{ tache.titre }}
+      </p>
+    </div>
+
+    <!-- Description -->
+    <div>
+      <label class="text-xs font-semibold text-slate-600 mb-1.5 block tracking-wide">DESCRIPTION</label>
+      <p class="text-sm text-slate-700 px-3 py-2 rounded-lg bg-slate-50 border border-slate-200 whitespace-pre-wrap min-h-[48px]">
+        {{ tache.description || 'Aucune description' }}
+      </p>
+    </div>
+
+    <!-- Priorité / Date début -->
+    <div class="grid grid-cols-2 gap-3.5">
+      <div>
+        <label class="text-xs font-semibold text-slate-600 mb-1.5 block tracking-wide">PRIORITÉ</label>
+        <p class="text-sm text-slate-900 px-3 py-2 rounded-lg bg-slate-50 border border-slate-200">
+          {{ prioriteAffichee.emoji }} {{ prioriteAffichee.label }}
+        </p>
+      </div>
+      <div>
+        <label class="text-xs font-semibold text-slate-600 mb-1.5 block tracking-wide">DATE DE DÉBUT</label>
+        <p class="text-sm text-slate-900 px-3 py-2 rounded-lg bg-slate-50 border border-slate-200">
+          {{ formatDate(tache.dateDebut) }}
+        </p>
+      </div>
+    </div>
+
+    <!-- Échéance -->
+    <div>
+      <label class="text-xs font-semibold text-slate-600 mb-1.5 block tracking-wide">DATE D'ÉCHÉANCE</label>
+      <p class="text-sm text-slate-900 px-3 py-2 rounded-lg bg-slate-50 border border-slate-200">
+        {{ formatDate(tache.echeance) }}
+      </p>
+    </div>
+
+    <!-- Taux d'avancement -->
+    <div>
+      <label class="text-xs font-semibold text-slate-600 mb-1.5 block tracking-wide">TAUX D'AVANCEMENT</label>
+      <div class="flex items-center gap-3">
+        <div class="flex-1 h-2 rounded-full bg-slate-200 overflow-hidden">
+          <div class="h-full bg-blue-600 rounded-full transition-all" [style.width.%]="tauxArrondi"></div>
+        </div>
+        <span class="text-sm font-semibold text-slate-700 w-10 text-right">{{ tauxArrondi }}%</span>
+      </div>
+    </div>
+
+    <!-- Collaborateurs assignés -->
+    <div>
+      <label class="text-xs font-semibold text-slate-600 mb-1.5 block tracking-wide">ASSIGNÉ À</label>
+      <div class="flex flex-wrap gap-2">
+        @for (membre of tache.collaborateurs; track membre.id) {
+          <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm border border-slate-300 bg-slate-50">
+            <div
+              class="w-[22px] h-[22px] rounded-full text-white flex items-center justify-center text-[8px] font-semibold border-2 border-white flex-shrink-0"
+              [style.background-color]="couleurAvatar(membre.id)">
+              {{ initiales(membre) }}
+            </div>
+            {{ membre.prenom }} {{ membre.nom }}
+          </div>
+        }
+        @if (aAucunCollaborateur) {
+          <p class="text-xs text-slate-400">Aucun collaborateur assigné</p>
+        }
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <div class="px-6 py-3.5 border-t border-slate-200 flex justify-end">
+    <button type="button" (click)="onClose()" class="px-5 py-2 rounded-lg bg-blue-600 text-white text-sm font-semibold">
+      Fermer
+    </button>
+  </div>
+</div>
+</div>

@@ -1,0 +1,27 @@
+ <div class="bg-white rounded-xl px-6 py-5 border border-slate-200 h-full flex flex-col">
+
+      <h3 class="mb-4 font-sans font-bold text-[15px] text-slate-900">
+        Tâches par mois
+      </h3>
+
+      <div class="h-[200px] w-full">
+        <canvas baseChart
+          class="w-full h-full"
+          [data]="barChartData"
+          [options]="barChartOptions"
+          [type]="'bar'">
+        </canvas>
+      </div>
+
+      <div class="flex gap-4 mt-1.5">
+        <span class="flex items-center gap-1 text-xs text-slate-500">
+          <span class="w-2.5 h-2.5 rounded-sm bg-[#3A7CA5] inline-block"></span>
+          Complétées
+        </span>
+        <span class="flex items-center gap-1 text-xs text-slate-500">
+          <span class="w-2.5 h-2.5 rounded-sm bg-[#d4e9f5] inline-block"></span>
+          Créées
+        </span>
+      </div>
+
+    </div>

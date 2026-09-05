@@ -1,0 +1,100 @@
+<div class="bg-white rounded-[10px] p-3.5 border border-slate-200 mb-2.5 transition-shadow duration-150 hover:shadow-md relative" >
+  
+  <!-- Header : badge priorité + menu -->
+  <div class="flex justify-between items-center mb-2">
+    <span [class]="'border rounded-full px-2.5 py-0.5 text-[11px] font-semibold ' + priorityStyles[priorityDB[tache.priorite]]">
+      {{priorityDB[tache.priorite]}}
+    </span>
+
+    <div *ngIf="(connectedUser?.role === 'ADMINISTRATEUR' || connectedUser?.role === 'CHEF_PROJET'|| estResponsable) && afficheIcone" class="relative">
+      <button class="bg-transparent border-none cursor-pointer text-slate-400 p-1 rounded hover:bg-slate-100"   (click)="toggleMenu($event)">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <circle cx="8" cy="3.5" r="1.2" fill="currentColor"/>
+          <circle cx="8" cy="8" r="1.2" fill="currentColor"/>
+          <circle cx="8" cy="12.5" r="1.2" fill="currentColor"/>
+        </svg>
+      </button>
+       <div *ngIf="menuOuvert" class="absolute right-0 top-6 bg-white shadow-lg rounded-xl border border-gray-100 z-20 py-1.5 w-44">
+         <button (click)="onVoirDetail()"
+          class="flex items-center gap-2.5 px-3.5 py-2 text-[13px] font-medium text-[#0f1923] hover:bg-slate-50 w-full text-left transition-colors rounded-lg mx-1 my-0.5"
+          style="width: calc(100% - 8px);">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round" class="shrink-0">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+            <circle cx="12" cy="12" r="3" />
+          </svg>
+          Voir détails
+        </button>
+    <button
+     *ngIf="connectedUser?.role === 'ADMINISTRATEUR' || connectedUser?.role === 'CHEF_PROJET'"
+      (click)="ouvrirModification()"
+      class="flex items-center gap-2.5 px-3.5 py-2 text-[13px] font-medium text-slate-700 hover:bg-slate-50 w-full text-left transition-colors rounded-lg mx-1 my-0.5">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+        <path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4z"/>
+      </svg>
+      Modifier tâche
+    </button>
+    <button *ngIf="estResponsable"
+    type="button" (click)="onMettreAJourAvancement()"
+    class="flex items-center gap-2.5 px-3.5 py-2 text-[13px] font-medium text-slate-700 hover:bg-slate-50 w-full text-left transition-colors rounded-lg mx-1 my-0.5">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-[#3a7ca5]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+    </svg>
+    Avancement
+  </button>
+  </div>
+    </div>
+  </div>
+
+  <!-- Titre de la tâche -->
+  <p class="m-0 mb-1.5 text-[13px] font-semibold text-slate-900 leading-normal">
+    {{tache.titre}}
+  </p>
+  <div class="mt-2">
+  <div class="h-1.5 w-full rounded-full bg-gray-100">
+    <div class="h-1.5 rounded-full bg-[#3a7ca5] transition-all"
+      [style.width.%]="tache.tauxAvancement ?? 0"></div>
+  </div>
+  <span class="mt-1 block text-[10px] text-gray-400">{{ tache.tauxAvancement ?? 0 }}%</span>
+</div>
+  <!-- Footer : avatar + commentaire + date -->
+ <div class="flex items-center justify-between mt-2.5">
+  <div class="flex items-center">
+    <div
+      *ngFor="let member of responsables; let i = index"
+      [class.ml-0]="i === 0"
+      [class.-ml-2]="i !== 0">
+      <div class="w-[26px] h-[26px] rounded-full bg-[#9C9CA1] text-white flex items-center justify-center text-[9.36px] font-semibold border-2 border-white shrink-0">
+        {{ (member.prenom.charAt(0)) + (member.nom.charAt(0)) }}
+      </div>
+    </div>
+  </div>
+
+  <div class="flex items-center gap-3">
+    <span class="text-[11px] text-slate-500 flex items-center gap-1">
+      <svg width="11" height="11" viewBox="0 0 13 13" fill="none">
+        <rect x="1" y="2.5" width="11" height="10" rx="2" stroke="currentColor" stroke-width="1.2"/>
+        <path d="M4 1v3M9 1v3M1 6h11" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+      </svg>
+      {{ tache.echeance | date:'dd/MM/yyyy' }}
+    </span>
+    <button
+    *ngIf="(connectedUser?.role === 'ADMINISTRATEUR' || connectedUser?.role === 'CHEF_PROJET'|| estResponsable) && afficheIcone" class="relative"
+      type="button"
+      (click)="ouvrirDetail.emit(tache)"
+      class="flex items-center gap-1 text-slate-400 hover:text-[#3a7ca5] transition-colors bg-transparent border-none cursor-pointer p-0.5">
+     <i class="fa-regular fa-comment"></i>
+
+      
+    </button>
+ <button
+    *ngIf="(connectedUser?.role === 'ADMINISTRATEUR' || connectedUser?.role === 'CHEF_PROJET' || estResponsable) && afficheIcone"
+    type="button"
+    (click)="ouvrirPiecesJointes.emit(tache)"
+    class="flex items-center gap-1 text-slate-400 hover:text-[#3a7ca5] transition-colors bg-transparent border-none cursor-pointer p-0.5">
+    <i class="fa-solid fa-paperclip"></i>
+  </button>
+  </div>
+</div>
+</div>

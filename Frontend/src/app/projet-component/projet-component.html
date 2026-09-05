@@ -1,0 +1,28 @@
+
+
+<div  class="flex-1 flex flex-col h-screen overflow-hidden">
+<app-header-component [title]="'Projets'" [subtitle]="'tous les projets'" [actionButtonText]="connectedUser.role != 'COLLABORATEUR' ? 'Nouveau Projet' :''" (clickedbutton)="onActionButtonClick($event)"></app-header-component>
+
+<div class="flex-1 overflow-y-auto p-6 bg-[#EDEEF7]  w-full  border border-[#e2eaf0]">
+
+<div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mb-6">
+<app-stat-cart-component *ngFor="let carte of statCartes" [carte]="carte"></app-stat-cart-component></div>
+ <div class="flex gap-2 mb-5 flex-wrap">
+  <button
+    *ngFor="let filtre of filtres"
+    (click)="selectFiltre(filtre)"
+    class="px-4 py-1.5 rounded-full border-[1.5px] text-[13px] font-['Inter',sans-serif] cursor-pointer"
+    [ngClass]="selectedFiltre === filtre 
+      ? 'bg-[#3a7ca5] border-[#3a7ca5] text-white font-semibold' 
+      : 'bg-white border-[#d4dfe8] text-[#6b7f8e] font-normal'"
+  >
+    {{ filtre }}
+  </button>
+</div>
+<div class="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(260px,1fr))] cursor-pointer transition-all duration-200 shadow-none hover:shadow-md">
+  <app-projet-cart-component *ngFor="let projet of selectedprojets" [projet]="projet" (click)="selectProjet(projet)"></app-projet-cart-component>
+</div>
+</div>
+</div>
+
+<app-form-ajout-projet [isOpen]="addProjet" (isClosed)="fermerForm($event)" (projetCree)="submitForm($event)"></app-form-ajout-projet>

@@ -1,0 +1,29 @@
+<div *ngIf="isOpen" class="fixed inset-0 z-[60] flex items-center justify-center px-4">
+  <div class="fixed inset-0 bg-slate-900/40" (click)="onClose()"></div>
+  <div class="relative bg-white rounded-2xl shadow-xl w-full max-w-md px-6 py-6">
+    <h2 class="font-bold text-lg text-slate-900 mb-4">Ajouter un membre au pôle</h2>
+
+    <select [(ngModel)]="selectedId" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm mb-4">
+      <option [ngValue]="null" disabled>Sélectionner un collaborateur</option>
+      <option *ngFor="let u of utilisateursEligibles" [ngValue]="u.id">
+        {{ u.nom }} {{ u.prenom }} ({{ u.role }})
+      </option>
+    </select>
+
+    <p *ngIf="utilisateursEligibles.length === 0" class="text-sm text-slate-500 mb-4">
+      Tous les utilisateurs sont déjà membres de ce pôle.
+    </p>
+
+    <p *ngIf="erreur" class="text-sm text-red-600 mb-3">{{ erreur }}</p>
+
+    <div class="flex gap-3">
+      <button (click)="onClose()" class="flex-1 py-2.5 rounded-xl border border-slate-200 text-slate-700 font-semibold text-sm">
+        Annuler
+      </button>
+      <button (click)="onSubmit()" [disabled]="enCours || selectedId == null"
+        class="flex-1 py-2.5 rounded-xl bg-[#3a7ca5] text-white font-semibold text-sm disabled:opacity-60">
+        {{ enCours ? 'Ajout...' : 'Ajouter' }}
+      </button>
+    </div>
+  </div>
+</div>

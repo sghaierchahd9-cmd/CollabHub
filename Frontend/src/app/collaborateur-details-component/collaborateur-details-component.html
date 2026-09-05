@@ -1,0 +1,208 @@
+<!-- Backdrop -->
+<div *ngIf="collaborateurId" class="fixed inset-0 bg-slate-900/20 z-40" (click)="close.emit()"></div>
+
+<!-- Panel -->
+<div *ngIf="collaborateurId"
+  class="fixed top-0 right-0 bottom-0 w-[420px] max-w-[95vw] bg-white shadow-[-8px_0_40px_rgba(15,25,35,0.14)] z-50 flex flex-col overflow-y-auto">
+
+  <ng-container *ngIf="collaborateur as c; else loadingTpl">
+
+    <!-- Header -->
+    <div class="bg-[#16425B] px-6 pt-7 pb-6 relative shrink-0">
+      <button (click)="close.emit()"
+        class="absolute top-4 right-4 bg-white/10 hover:bg-white/20 rounded-lg w-8 h-8 flex items-center justify-center text-white transition-colors">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+        </svg>
+      </button>
+
+      <div class="flex items-center gap-4">
+        <app-avatar-component [nom]="c.nom" [prenom]="c.prenom" [photoProfilUrl]="c.photoProfilUrl ?? null"
+          taille="lg" />
+        <div>
+          <h2 class="mb-1.5 font-sans font-bold text-xl text-white tracking-tight">
+            {{ c.prenom }} {{ c.nom }}
+          </h2>
+          <div class="flex items-center gap-2">
+            <span
+              class="bg-[#dbeeff] text-[#2f6690] rounded-full px-2.5 py-0.5 text-xs font-semibold whitespace-nowrap">
+              {{ c.role }}
+            </span>
+            <span class="w-1.5 h-1.5 rounded-full" [ngClass]="statutConfig(c.statutActivite ).dotClass"></span>
+            <span class="text-white/70 text-xs">{{ statutConfig(c.statutActivite).label }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-5 flex flex-col gap-2">
+        <div class="flex items-center gap-2 text-white text-[13px]">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+            <rect x="1" y="3" width="13" height="9" rx="2" stroke="currentColor" stroke-width="1.3" />
+            <path d="M1 5l6.5 4L14 5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" />
+          </svg>
+          {{ c.email }}
+        </div>
+
+        <div *ngIf="c.modeTravail" class="flex items-center gap-2 text-white text-[13px]">
+        
+          <svg xmlns="http://www.w3.org/2000/svg" height="15" width="15"
+            viewBox="0 0 512 512"><!--!Font Awesome Free v7.3.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.-->
+            <path fill="rgb(255, 255, 255)"
+              d="M448 96l0 256-384 0 0-256 384 0zM64 32C28.7 32 0 60.7 0 96L0 352c0 35.3 28.7 64 64 64l144 0-16 48-72 0c-13.3 0-24 10.7-24 24s10.7 24 24 24l272 0c13.3 0 24-10.7 24-24s-10.7-24-24-24l-72 0-16-48 144 0c35.3 0 64-28.7 64-64l0-256c0-35.3-28.7-64-64-64L64 32z" />
+          </svg>
+           mode de travail :  {{ c.modeTravail }}
+        </div>
+
+        <div class="flex items-center gap-2 text-white/85 text-[13px]">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+            <rect x="1" y="2.5" width="11" height="10" rx="2" stroke="currentColor" stroke-width="1.2" />
+            <path d="M4 1v3M9 1v3M1 6h11" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" />
+          </svg>
+          Membre depuis {{ c.dateCreation | date:'dd/MM/yyyy'}}
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="grid grid-cols-3 border-b border-slate-200 shrink-0">
+      <div class="py-4 text-center border-r border-slate-200">
+        <p class="font-sans font-bold text-2xl text-slate-900 tracking-tight">{{ projets.length }}</p>
+        <p class="mt-0.5 text-[11px] text-slate-500 font-medium">Projets</p>
+      </div>
+      <div class="py-4 text-center border-r border-slate-200">
+        <p class="font-sans font-bold text-2xl text-slate-900 tracking-tight">{{ taches.length }}</p>
+        <p class="mt-0.5 text-[11px] text-slate-500 font-medium">Tâches totales</p>
+      </div>
+      <div class="py-4 text-center">
+        <p class="font-sans font-bold text-2xl text-slate-900 tracking-tight">{{ nbTachesTerminees }}</p>
+        <p class="mt-0.5 text-[11px] text-slate-500 font-medium">Terminées</p>
+      </div>
+    </div>
+
+    <div class="flex-1 px-6 py-5 flex flex-col gap-6">
+
+      <!-- Progression -->
+      <div>
+        <div class="flex justify-between items-center mb-2.5">
+          <h3 class="font-sans font-bold text-sm text-slate-900">Progression des tâches</h3>
+          <span class="text-xs text-slate-500">{{ progressionPct(c) }}%</span>
+        </div>
+        <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+          <div class="h-full bg-[#3A7CA5] rounded-full transition-all duration-500" [style.width.%]="progressionPct(c)">
+          </div>
+        </div>
+        <div class="flex gap-3.5 mt-2 flex-wrap">
+          <div class="flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-slate-300 inline-block"></span>
+            <span class="text-[11px] text-slate-500">À faire <strong class="text-slate-900">{{
+                repartitionTache['aFaire'] }}</strong></span>
+          </div>
+          <div class="flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#3A7CA5] inline-block"></span>
+            <span class="text-[11px] text-slate-500">En cours <strong class="text-slate-900">{{
+                repartitionTache['enCours'] }}</strong></span>
+          </div>
+          <div class="flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-red-500 inline-block"></span>
+            <span class="text-[11px] text-slate-500">Bloquée <strong class="text-slate-900">{{
+                repartitionTache['bloquee'] }}</strong></span>
+          </div>
+          <div class="flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-green-500 inline-block"></span>
+            <span class="text-[11px] text-slate-500">Terminée <strong
+                class="text-slate-900">{{repartitionTache['terminee'] }}</strong></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Projets assignés -->
+      <div>
+        <h3 class="mb-3 font-sans font-bold text-sm text-slate-900">
+          Projets assignés
+          <span class="bg-slate-100 rounded-[10px] px-1.5 py-0.5 text-[11px] font-semibold text-slate-500 ml-1">{{
+            projets.length }}</span>
+        </h3>
+        <div class="flex flex-col gap-2">
+          <div *ngFor="let p of projets"
+            class="flex items-center gap-3 px-3.5 py-3 rounded-[10px] border border-slate-200 bg-slate-50/50">
+            <div class="w-9 h-9 rounded-lg bg-[#eef6fc] flex items-center justify-center shrink-0">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M1 4a1 1 0 011-1h4l1.5 2H14a1 1 0 011 1v7a1 1 0 01-1 1H2a1 1 0 01-1-1V4z" fill="#3A7CA5" />
+              </svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-[13px] font-semibold text-slate-900 truncate">{{ p.nom }}</p>
+              <p class="text-[11px] text-slate-500 flex items-center gap-1">
+                <svg width="10" height="10" viewBox="0 0 13 13" fill="none">
+                  <rect x="1" y="2.5" width="11" height="10" rx="2" stroke="currentColor" stroke-width="1.2" />
+                  <path d="M4 1v3M9 1v3M1 6h11" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" />
+                </svg>
+                {{ p.dateFinPrevue }}
+              </p>
+            </div>
+            <div class="flex flex-col items-end gap-1 shrink-0">
+              <span
+                class="bg-[#dbeeff] text-[#2f6690] rounded-full px-2.5 py-0.5 text-xs font-semibold whitespace-nowrap">{{
+                p.statut }}</span>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tâches récentes -->
+      <div>
+        <h3 class="mb-3 font-sans font-bold text-sm text-slate-900">
+          Tâches récentes
+          <span
+            class="bg-slate-100 rounded-[10px] px-1.5 py-0.5 text-[11px] font-semibold text-slate-500 ml-1">{{TacheRecentes.length}}</span>
+        </h3>
+        <div class="flex flex-col">
+          <div *ngFor="let t of TacheRecentes ; let first = first" class="flex items-center gap-2.5 py-2.5"
+            [ngClass]="first ? '' : 'border-t border-slate-100'">
+            <span class="w-2 h-2 rounded-full shrink-0" [ngClass]="tacheDotClass(t.statut)"></span>
+            <div class="flex-1 min-w-0">
+              <p class="text-[13px] font-medium text-slate-900 truncate"
+                [ngClass]="t.statut === 'TERMINEE' ? 'line-through' : ''">
+                {{ t.titre }}
+              </p>
+              <p class="text-[11px] text-[#81c3d7] font-medium">{{chercherProjet(t)}}</p>
+            </div>
+            <div class="flex flex-col items-end gap-0.5 shrink-0">
+              <span class="rounded-xl px-1.5 py-0.5 text-[10px] font-semibold" [ngClass]="prioriteClass(t.priorite)">
+                {{ prioriteLabel(t.priorite) }}
+              </span>
+              <span class="text-[10px] text-slate-500 flex items-center gap-0.5">
+                <svg width="10" height="10" viewBox="0 0 13 13" fill="none">
+                  <rect x="1" y="2.5" width="11" height="10" rx="2" stroke="currentColor" stroke-width="1.2" />
+                  <path d="M4 1v3M9 1v3M1 6h11" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" />
+                </svg>
+                {{ t.echeance }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="px-6 py-4 border-t border-slate-200 shrink-0">
+      <button (click)="onSupprimer(c)"
+        class="w-full py-2.5 rounded-[10px] border-[1.5px] border-red-300 bg-red-50 text-red-700 font-semibold text-[13px] flex items-center justify-center gap-2 hover:bg-red-100 transition-colors">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+          <path
+            d="M2 4h11M5 4V2.5a.5.5 0 01.5-.5h4a.5.5 0 01.5.5V4M6 7v4M9 7v4M3 4l.8 8.5A1 1 0 004.8 13.5h5.4a1 1 0 001-.9L12 4"
+            stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        Supprimer le collaborateur
+      </button>
+    </div>
+
+  </ng-container>
+
+  <ng-template #loadingTpl>
+    <div class="flex-1 flex items-center justify-center text-slate-400 text-sm">Chargement...</div>
+  </ng-template>
+
+</div>

@@ -1,0 +1,18 @@
+<div
+  class="w-80 bg-white shadow-lg rounded-lg border-l-4 p-4 flex items-start gap-3 cursor-pointer hover:shadow-xl transition-shadow"
+  [ngClass]="urgente ? 'border-red-500' : 'border-blue-500'"
+  (click)="onClick()">
+  <div class="flex-1 min-w-0">
+    <p class="text-xs font-semibold uppercase tracking-wide"
+       [ngClass]="urgente ? 'text-red-600' : 'text-blue-600'">
+      {{ libelle }}
+    </p>
+    <p class="text-sm text-gray-700 mt-1">{{ notification.message }}</p>
+  </div>
+  <button
+    (click)="onCloseClick($event)"
+    class="text-gray-400 hover:text-gray-600 shrink-0"
+    aria-label="Fermer">
+    ✕
+  </button>
+</div>

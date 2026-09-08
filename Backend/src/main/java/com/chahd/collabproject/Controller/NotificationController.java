@@ -30,7 +30,7 @@ public class NotificationController {
 
     @PatchMapping("/{id}/lue")
     public NotificationDTO marquerCommeLue(@PathVariable Integer id, @AuthenticationPrincipal Utilisateur user) {
-        Notification notification = notificationRepository.findById(id)
+        Notification notification = notificationRepository.findByIdAndDateSuppressionIsNull(id)
                 .orElseThrow(() -> new EntityNotFoundException("Notification introuvable"));
 
         if (notification.getUser().getId() != user.getId()) {

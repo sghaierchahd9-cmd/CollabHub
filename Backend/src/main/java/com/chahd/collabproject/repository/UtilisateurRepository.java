@@ -32,5 +32,7 @@ public interface UtilisateurRepository extends JpaRepository<Utilisateur,Integer
     boolean existsByEmail(String email);
    List<Utilisateur> findByRoleAndDateSuppressionIsNull(String role);
     Optional<Utilisateur> findByEmailAndDateSuppressionIsNull(String email);
+    Optional<Utilisateur> findByIdAndDateSuppressionIsNull(Integer id);
+    List<Utilisateur> findAllByDateSuppressionIsNull();
 
 }

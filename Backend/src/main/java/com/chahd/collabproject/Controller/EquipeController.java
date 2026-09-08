@@ -69,10 +69,10 @@ public class EquipeController {
     @PostMapping("/{id}/membres/{userId}")
     @PreAuthorize("hasRole('ADMINISTRATEUR')")
     public ResponseEntity<?> ajouterMembre(@PathVariable int id, @PathVariable int userId) {
-        Equipe equipe = equipeRepository.findById(id).orElse(null);
+        Equipe equipe = equipeRepository.findByIdAndDateSuppressionIsNull(id).orElse(null);
         if (equipe == null) return ResponseEntity.notFound().build();
 
-        Utilisateur utilisateur = utilisateurRepository.findById(userId).orElse(null);
+        Utilisateur utilisateur = utilisateurRepository.findByIdAndDateSuppressionIsNull(userId).orElse(null);
         if (utilisateur == null) return ResponseEntity.notFound().build();
 
         Optional<MembrePole> existant = membrePoleRepository

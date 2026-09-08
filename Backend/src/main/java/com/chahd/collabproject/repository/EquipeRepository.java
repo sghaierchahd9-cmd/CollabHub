@@ -15,4 +15,5 @@ public interface EquipeRepository extends JpaRepository<Equipe, Integer> {
 
 
     List<Equipe> findAllByDateSuppressionIsNull();
+    Optional<Equipe> findByIdAndDateSuppressionIsNull(Integer id);
 }

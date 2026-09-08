@@ -66,7 +66,7 @@ public class UtilisateurService {
         List<Utilisateur> visibles;
 
         if ("ADMINISTRATEUR".equals(user.getRole())) {
-            visibles = utilisateurRepo.findAll();
+            visibles = utilisateurRepo.findAllByDateSuppressionIsNull();
         } else {
             Set<Utilisateur> set = new HashSet<>();
             for (Projet p : projetService.getProjets(user)) {
@@ -91,7 +91,7 @@ public class UtilisateurService {
     @Transactional
     public void affecterPoles(Utilisateur utilisateur, List<Integer> equipeIds) {
         for (int equipeId : equipeIds) {
-            Equipe equipe = equipeRepository.findById(equipeId)
+            Equipe equipe = equipeRepository.findByIdAndDateSuppressionIsNull(equipeId)
                     .orElseThrow(() -> new EntityNotFoundException("Equipe n'existe pas"));
 
             MembrePole mp = new MembrePole();

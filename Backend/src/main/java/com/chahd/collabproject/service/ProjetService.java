@@ -103,9 +103,9 @@ public class ProjetService {
     public void ajouterMembre(int projetId, int utilisateurId, Utilisateur acteur) {
 
         Projet projet = projetRepository.findById(projetId)
-                .orElseThrow(() -> new RuntimeException("Projet introuvable"));
+                .orElseThrow(() -> new EntityNotFoundException("Projet introuvable"));
         Utilisateur membre = utilisateurRepository.findById(utilisateurId)
-                .orElseThrow(() -> new RuntimeException("Utilisateur introuvable"));
+                .orElseThrow(() -> new EntityNotFoundException("Utilisateur introuvable"));
         if(!peutModifier(acteur,projet)){
             throw new AccessDeniedException("Access denied");
         }
@@ -138,15 +138,15 @@ public class ProjetService {
     @Transactional
     public void desaffecterMembre(int projetId, int utilisateurId, Utilisateur acteur) {
         Projet projet = projetRepository.findById(projetId)
-                .orElseThrow(() -> new RuntimeException("Projet introuvable"));
+                .orElseThrow(() -> new EntityNotFoundException("Projet introuvable"));
         Utilisateur membre = utilisateurRepository.findById(utilisateurId)
-                .orElseThrow(() -> new RuntimeException("Utilisateur introuvable"));
+                .orElseThrow(() -> new EntityNotFoundException("Utilisateur introuvable"));
         if(!peutModifier(acteur,projet)){
             throw new AccessDeniedException("Access denied");
         }
         MembreProjet mp = membreProjetRepository
                 .findByProjetIdAndUtilisateurIdAndDateSuppressionIsNull(projetId, utilisateurId)
-                .orElseThrow(() -> new RuntimeException("Ce membre n'est pas actif sur ce projet"));
+                .orElseThrow(() -> new IllegalArgumentException("Ce membre n'est pas actif sur ce projet"));
 
         mp.setDateSuppression(OffsetDateTime.now());
         membreProjetRepository.save(mp);

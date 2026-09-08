@@ -17,8 +17,10 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.*;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -87,18 +89,16 @@ public class UtilisateurController {
         return utilisateurService.getCollaborateursVisibles(user);
     }
     @GetMapping("/{id}")
-    public ResponseEntity<UtilisateurDTO> findById(@PathVariable int id){
-        UtilisateurDTO utilisateurDTO = new UtilisateurDTO();
-        ResponseEntity<Utilisateur> response = utilisateurRepository.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-        if(response.getStatusCode().is2xxSuccessful()){
-            return ResponseEntity.ok(utilisateurDTO.fromUtilisateur(response.getBody()));
-        }
-        else{
+    public ResponseEntity<UtilisateurDTO> findById(@PathVariable int id, @AuthenticationPrincipal Utilisateur connecte){
+        Utilisateur cible = utilisateurRepository.findById(id).orElse(null);
+        if (cible == null) {
             return ResponseEntity.notFound().build();
-
-    }}
+        }
+        if (!utilisateurService.estVisiblePour(connecte, cible)) {
+            throw new AccessDeniedException("Vous n'avez pas accès aux informations de cet utilisateur.");
+        }
+        return ResponseEntity.ok(UtilisateurDTO.fromUtilisateur(cible));
+    }
 
 
     @PostMapping()
@@ -108,6 +108,7 @@ public class UtilisateurController {
     }
         // pour la sécurité on va traiter la modification de mdp separement
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMINISTRATEUR')")
      public ResponseEntity<Utilisateur> update(@PathVariable int id, @RequestBody UtilisateurDTO user){
         return utilisateurRepository.findById(id)
                 .map(existing -> {
@@ -134,7 +135,11 @@ public class UtilisateurController {
 
 
     @PutMapping("/password/{id}")
-    public ResponseEntity<?> updatePassword(@PathVariable int id, @RequestBody UpdatePasswordDTO dto) {
+    public ResponseEntity<?> updatePassword(@PathVariable int id, @RequestBody UpdatePasswordDTO dto,
+                                            @AuthenticationPrincipal Utilisateur connecte) {
+        if (connecte.getId() != id) {
+            throw new AccessDeniedException("Vous ne pouvez modifier que votre propre mot de passe");
+        }
         Optional<Utilisateur> utilisateurOpt = utilisateurRepository.findById(id);
 
         if (utilisateurOpt.isEmpty()) {
@@ -156,24 +161,24 @@ public class UtilisateurController {
     //la fonction qui va retourner les membres de l'equipe fixe (creé par l'admin)
     @GetMapping("/membres/{id}")
     public List<UtilisateurDTO> getMembreEquipe(@PathVariable int id){
-        Equipe equipe = equipeRepository.findById(id).get();
+        Equipe equipe = equipeRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Equipe introuvable"));
+
         List<UtilisateurDTO> utilisateurDTOs = new ArrayList<>();
-        if( equipe != null) {
-            List<MembrePole> mps = membrePoleRepository.findByEquipeIdAndDateSuppressionIsNull(equipe.getId());
-            List<Utilisateur> members = new ArrayList<>();
-            for (MembrePole membrePole : mps) {
-                members.add(membrePole.getUtilisateur());
+        List<MembrePole> mps = membrePoleRepository.findByEquipeIdAndDateSuppressionIsNull(equipe.getId());
+        List<Utilisateur> members = new ArrayList<>();
+        for (MembrePole membrePole : mps) {
+            members.add(membrePole.getUtilisateur());
+        }
+        for (Utilisateur utilisateur : members) {
+            int nbProjets;
+            if (utilisateur.getRole().equals("COLLABORATEUR")) {
+                nbProjets = membreProjetRepository.countByUtilisateurId(utilisateur.getId());
+            } else {
+                nbProjets = projetRepository.countProjetsForChef(utilisateur);
             }
-            for (Utilisateur utilisateur : members) {
-                int nbProjets;
-                if(utilisateur.getRole().equals("COLLABORATEUR")) {
-              nbProjets = membreProjetRepository.countByUtilisateurId(utilisateur.getId());}
-                else{
-                  nbProjets=projetRepository.countProjetsForChef(utilisateur);
-                }
-                int nbTaches = tacheRepository.countTachesForUser(utilisateur);
-                utilisateurDTOs.add(UtilisateurDTO.FromUtilisateurAvecStats(utilisateur,nbProjets,nbTaches));
-            }
+            int nbTaches = tacheRepository.countTachesForUser(utilisateur);
+            utilisateurDTOs.add(UtilisateurDTO.FromUtilisateurAvecStats(utilisateur, nbProjets, nbTaches));
         }
         return utilisateurDTOs;
     }
@@ -193,19 +198,15 @@ public class UtilisateurController {
     }
     @GetMapping("/projet/{id}")
     public ResponseEntity<?> getCollaborateurByProjet(@PathVariable int id){
-        Projet p = projetRepository.findById(id).get();
-        if(p==null){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Utilisateur inexistant");
-        }
-        else{
-            List<Utilisateur> utilisateurs = p.getCollaborateurs();
-            List<UtilisateurDTO> utilisateurDTOS = new ArrayList<>();
-            for(Utilisateur utilisateur : utilisateurs){
-                utilisateurDTOS.add(UtilisateurDTO.fromUtilisateur(utilisateur));
-            }
-            return ResponseEntity.ok(utilisateurDTOS);
-        }
+        Projet p = projetRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Projet introuvable"));
 
+        List<Utilisateur> utilisateurs = p.getCollaborateurs();
+        List<UtilisateurDTO> utilisateurDTOS = new ArrayList<>();
+        for (Utilisateur utilisateur : utilisateurs) {
+            utilisateurDTOS.add(UtilisateurDTO.fromUtilisateur(utilisateur));
+        }
+        return ResponseEntity.ok(utilisateurDTOS);
     }
 
     @GetMapping("/role/{role}")
@@ -261,7 +262,11 @@ public class UtilisateurController {
     }
     @PutMapping("/profil/{id}")
 
-    public ResponseEntity<?> updateProfil(@PathVariable int id, @RequestBody UpdateProfileDTO dto) {
+    public ResponseEntity<?> updateProfil(@PathVariable int id, @RequestBody UpdateProfileDTO dto,
+                                          @AuthenticationPrincipal Utilisateur connecte) {
+        if (connecte.getId() != id && !"ADMINISTRATEUR".equals(connecte.getRole())) {
+            throw new AccessDeniedException("Vous ne pouvez modifier que votre propre profil");
+        }
         Optional<Utilisateur> utilisateurOpt = utilisateurRepository.findById(id);
 
         if (utilisateurOpt.isEmpty()) {
@@ -285,11 +290,7 @@ public class UtilisateurController {
 
         return ResponseEntity.ok(UtilisateurDTO.fromUtilisateur(utilisateur));
     }
-    @ExceptionHandler(EmailDejaExistantException.class)
-    public ResponseEntity<Map<String, String>> handleEmailDuplique(EmailDejaExistantException ex) {
-        return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(Map.of("message", ex.getMessage()));
-    }
+
 
     @PostMapping("/photo-profil")
     public ResponseEntity<UtilisateurDTO> uploaderPhotoProfil(

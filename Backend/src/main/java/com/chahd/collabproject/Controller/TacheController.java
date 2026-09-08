@@ -8,8 +8,10 @@ import com.chahd.collabproject.repository.ProjetRepository;
 import com.chahd.collabproject.repository.TacheRepository;
 import com.chahd.collabproject.repository.UtilisateurRepository;
 import com.chahd.collabproject.service.TacheService;
+import com.chahd.collabproject.service.UtilisateurService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -28,11 +30,14 @@ public class TacheController {
     private final TacheService tacheService;
     private final ProjetRepository projetRepository;
    private final UtilisateurRepository utilisateurRepository;
-    public TacheController(TacheRepository tacheRepository, TacheService tacheService, ProjetRepository projetRepository, UtilisateurRepository utilisateurRepository) {
+    private final UtilisateurService utilisateurService;
+    public TacheController(TacheRepository tacheRepository, TacheService tacheService, ProjetRepository projetRepository,
+                           UtilisateurRepository utilisateurRepository, UtilisateurService utilisateurService) {
         this.tacheRepository = tacheRepository;
         this.tacheService = tacheService;
         this.projetRepository = projetRepository;
         this.utilisateurRepository = utilisateurRepository;
+        this.utilisateurService = utilisateurService;
     }
 @GetMapping()
     public List<TacheDTO> getTaches(Authentication authentication) {
@@ -52,20 +57,18 @@ public class TacheController {
 }
 
 
-@GetMapping("/projet/{id}")
-    public List<TacheDTO> getTachesProjet( @PathVariable int id) {
-        Projet projet=projetRepository.findById(id).get();
-    List<Tache> taches = new ArrayList<>();
-        if(projet!=null){
-             taches =tacheRepository.findTacheByProjet(projet);
-        }
+    @GetMapping("/projet/{id}")
+    public List<TacheDTO> getTachesProjet(@PathVariable int id) {
+        Projet projet = projetRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Projet introuvable"));
+
+        List<Tache> taches = tacheRepository.findTacheByProjet(projet);
         List<TacheDTO> tachesDTO = new ArrayList<>();
-        for(Tache tache : taches){
+        for (Tache tache : taches) {
             tachesDTO.add(TacheDTO.fromTache(tache));
         }
         return tachesDTO;
-
-}
+    }
     @PatchMapping("/statut/{id}")
     public TacheDTO changerStatut(@PathVariable int id, @RequestBody Map<String, String> body, Authentication authentication) {
         Utilisateur user=(Utilisateur) authentication.getPrincipal();
@@ -106,16 +109,20 @@ public class TacheController {
     public ResponseEntity<List<TacheDTO>> getTachesMembre(
             @PathVariable Integer membreId,
             @AuthenticationPrincipal Utilisateur utilisateur
-    )
-    {
-        Utilisateur user=utilisateurRepository.findById(membreId).orElseThrow(()-> new EntityNotFoundException("membre not found "));
-         List<TacheDTO> tacheDTOS=new ArrayList<>();
-         List<Tache> taches= tacheRepository.TachesForUser(user);
-         for(Tache tache : taches){
-             tacheDTOS.add(TacheDTO.fromTache(tache));
-         }
-         return ResponseEntity.ok(tacheDTOS);
+    ) {
+        Utilisateur user = utilisateurRepository.findById(membreId)
+                .orElseThrow(() -> new EntityNotFoundException("membre not found"));
 
+        if (!utilisateurService.estVisiblePour(utilisateur, user)) {
+            throw new AccessDeniedException("Vous n'avez pas accès aux tâches de cet utilisateur.");
+        }
+
+        List<TacheDTO> tacheDTOS = new ArrayList<>();
+        List<Tache> taches = tacheRepository.TachesForUser(user);
+        for (Tache tache : taches) {
+            tacheDTOS.add(TacheDTO.fromTache(tache));
+        }
+        return ResponseEntity.ok(tacheDTOS);
     }
 
 }

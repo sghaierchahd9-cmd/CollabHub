@@ -147,12 +147,14 @@ public class CommentaireService {
     }
 
     private void verifierAcces(Tache tache, Utilisateur utilisateur) {
-        boolean estAdminOuChef = "ADMINISTRATEUR".equals(utilisateur.getRole())
-                || "CHEF_PROJET".equals(utilisateur.getRole());
+        boolean estAdmin = "ADMINISTRATEUR".equals(utilisateur.getRole());
+        boolean estChef = "CHEF_PROJET".equals(utilisateur.getRole()) && tache.getProjet().getChefProjet().equals(utilisateur);
+
+
         boolean estResponsable = tache.getCollaborateurs().stream()
                 .anyMatch(c -> c.getId()==utilisateur.getId());
 
-        if (!estAdminOuChef && !estResponsable) {
+        if (!estAdmin && !estResponsable && !estChef) {
             throw new AccessDeniedException("Vous n'avez pas accès à cette tâche.");
         }
     }
@@ -171,7 +173,7 @@ public class CommentaireService {
                 .orElseThrow(() -> new EntityNotFoundException("Commentaire introuvable"));
 
         boolean estAdminOuChef = "ADMINISTRATEUR".equals(utilisateur.getRole())
-                || "CHEF_PROJET".equals(utilisateur.getRole());
+                || ("CHEF_PROJET".equals(utilisateur.getRole()) &&  utilisateur.equals(cmnt.getProjet().getChefProjet()));
         boolean estAuteur = utilisateur.equals(cmnt.getUser());
 
         if (!estAdminOuChef && !estAuteur) {

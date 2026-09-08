@@ -102,7 +102,7 @@ public class TacheService {
     public TacheDTO modifierTacheComplete(int tacheId, TacheDTO dto, Utilisateur acteur) {
         Tache tache = tacheRepo.findById(tacheId)
                 .orElseThrow(() -> new RuntimeException("Tâche introuvable"));
-
+        verifierDroitModificationTache(tache, acteur);
         String ancienStatut = tache.getStatut();
 
         tache.setTitre(dto.getTitre());
@@ -227,7 +227,7 @@ public class TacheService {
     public Tache modifierStatutTache(int tacheId, String statut, Utilisateur acteur) {
         Tache tache = tacheRepo.findById(tacheId)
                 .orElseThrow(() -> new RuntimeException("Tâche introuvable"));
-
+        verifierDroitChangerStatut(tache, acteur);
         String ancienStatut = tache.getStatut();
         tache.setStatut(statut);
         tacheRepo.save(tache);
@@ -255,5 +255,25 @@ public class TacheService {
         activityLogRepository.save(log);
 
         return tache;
+    }
+
+    private void verifierDroitModificationTache(Tache tache, Utilisateur acteur) {
+        boolean estAdmin = "ADMINISTRATEUR".equals(acteur.getRole());
+        boolean estChefDuProjet = "CHEF_PROJET".equals(acteur.getRole())
+                && tache.getProjet().getChefProjet().getId() == acteur.getId();
+        if (!estAdmin && !estChefDuProjet) {
+            throw new AccessDeniedException("Vous n'êtes pas autorisé à modifier cette tâche.");
+        }
+    }
+
+    private void verifierDroitChangerStatut(Tache tache, Utilisateur acteur) {
+        boolean estAdmin = "ADMINISTRATEUR".equals(acteur.getRole());
+        boolean estChefDuProjet = "CHEF_PROJET".equals(acteur.getRole())
+                && tache.getProjet().getChefProjet().getId() == acteur.getId();
+        boolean estAffecte = tache.getCollaborateurs().stream()
+                .anyMatch(c -> c.getId() == acteur.getId());
+        if (!estAdmin && !estChefDuProjet && !estAffecte) {
+            throw new AccessDeniedException("Vous n'êtes pas autorisé à changer le statut de cette tâche.");
+        }
     }
 }

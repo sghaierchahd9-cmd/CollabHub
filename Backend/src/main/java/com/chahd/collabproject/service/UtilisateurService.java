@@ -138,5 +138,18 @@ public void supprimer(int id){
     }
     utilisateurRepo.save(utilisateur);
 }
+    // UtilisateurService.java
+    @Transactional(readOnly = true)
+    public boolean estVisiblePour(Utilisateur acteur, Utilisateur cible) {
+        if (acteur.getId() == cible.getId()) return true;
+        if ("ADMINISTRATEUR".equals(acteur.getRole())) return true;
+
+        for (Projet p : projetService.getProjets(acteur)) {
+            boolean cibleEstChef = p.getChefProjet() != null && p.getChefProjet().getId() == cible.getId();
+            boolean cibleEstMembre = p.getCollaborateurs().stream().anyMatch(c -> c.getId() == cible.getId());
+            if (cibleEstChef || cibleEstMembre) return true;
+        }
+        return false;
+    }
 
 }

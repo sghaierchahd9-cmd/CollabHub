@@ -61,18 +61,17 @@ public class ProjetController {
         return ResponseEntity.status(HttpStatus.CREATED).body(ProjetDTO.fromentity(projet));
     }
     @GetMapping("/{id}")
-    public ResponseEntity<ProjetDTO> getProjetById(@PathVariable int id,Authentication authentication){
+    public ResponseEntity<ProjetDTO> getProjetById(@PathVariable int id, Authentication authentication){
         Utilisateur utilisateur = (Utilisateur) authentication.getPrincipal();
 
-        Projet projet = projetRepository.findById(id).isPresent()? projetRepository.findById(id).get() : null;
-        if(projet == null){
-            return ResponseEntity.notFound().build();
-        }
-       boolean estMembre = projet.getCollaborateurs().stream().anyMatch(utilisateur1 -> utilisateur1.getId()==utilisateur.getId());
+        Projet projet = projetRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Projet introuvable"));
 
-        if("ADMINISTRATEUR".equals(utilisateur.getRole()) || projet.getChefProjet().equals(utilisateur) || estMembre){
-        return ResponseEntity.ok(ProjetDTO.fromentity(projet));}
-        else{
+        boolean estMembre = projet.getCollaborateurs().stream().anyMatch(u -> u.getId() == utilisateur.getId());
+
+        if ("ADMINISTRATEUR".equals(utilisateur.getRole()) || projet.getChefProjet().equals(utilisateur) || estMembre) {
+            return ResponseEntity.ok(ProjetDTO.fromentity(projet));
+        } else {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
     }

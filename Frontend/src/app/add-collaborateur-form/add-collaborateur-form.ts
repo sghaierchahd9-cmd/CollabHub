@@ -52,8 +52,7 @@ export class AddCollaborateurForm implements OnChanges {
       return;
     }
    
-    console.log("payload d'ajout d'un membre : ", this.form.value)
- 
+   
     this.soumettre.emit(this.form.value); 
     
   }

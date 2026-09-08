@@ -84,7 +84,7 @@ export class FormAjoutProjet implements OnInit {
     });
   }
 
-  // --- Sélections uniques : tout passe par le form ---
+ 
   selectPriorite(priorite: string): void {
    
     this.form.patchValue({ niveauPriorite: priorite });

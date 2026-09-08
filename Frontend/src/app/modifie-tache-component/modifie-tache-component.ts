@@ -50,7 +50,7 @@ export class ModifieTacheComponent {
   }
 
   ngOnInit(): void {
-    // Pré-remplissage avec les données actuelles de la tâche
+    // Pré-remplissage 
     this.form.patchValue({
       titre: this.tache.titre,
       description: this.tache.description,
@@ -91,7 +91,7 @@ onSubmit(): void {
   const requete = {
     ...this.form.value,
     collaborateurs: Array.from(this.collaborateursIds).map(id => ({ id }))
-    // ou juste Array.from(this.collaborateursIds) si le backend attend un tableau d'ids
+  
   };
 
   this.tacheModifiee.emit({ id: this.tache.id, requete });

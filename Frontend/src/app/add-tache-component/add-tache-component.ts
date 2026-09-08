@@ -85,8 +85,7 @@ export class AddTacheComponent {
   onSubmit(): void {
     this.form.markAllAsTouched();
 
-    // La contrainte "au moins un collaborateur" ne vit pas dans le FormGroup
-    // (ce n'est pas un FormControl), donc validation manuelle ici
+  
     if (this.form.invalid || this.aucunCollaborateurSelectionne) {
       return;
     }

@@ -153,7 +153,7 @@ export class ProjetDetailComponent implements OnInit {
       this.chartData = this.chartLabels.map(
         label => this.CalculTacheParStatut(this.mapBdVue[label])
       );
-      console.log("taches : ", this.taches);
+     
     },
       (error) => {
         console.log("une erreur est survenue !!");
@@ -212,8 +212,7 @@ export class ProjetDetailComponent implements OnInit {
           },
         });
 
-        console.log('data parent : ', this.chartData);
-        console.log("notre Projet : ", this.projet)
+      
       },
       error:(err: HttpErrorResponse) => {
         if (err.status === 403) {
@@ -277,8 +276,7 @@ this.notificationSocketService.statutRecu.subscribe(update => {
       this.projetService.modifierProjet(projetModifie).subscribe(() => {
         this.chargerEquipe();
         this.notifService.notifierActivite();
-        console.log('nouveau projet : ', projetModifie);
-        console.log('ids ajoutés : ', membreIds);
+     
       });
     }
 

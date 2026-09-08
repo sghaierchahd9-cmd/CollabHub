@@ -67,12 +67,10 @@ export class CommentaireInputComponent implements OnInit {
           this.suggestionsFiltrees = this.membresProjet.filter(m =>
             (m.nom + ' ' + m.prenom).toLowerCase().includes(recherche)
           );
-          console.log('Suggestions filtrées : ', this.suggestionsFiltrees);
-          console.log('liste des membres du projet : ', this.membresProjet);
+         
           this.optionTousVisible = 'tous'.includes(recherche);
           this.suggestionsVisibles = this.suggestionsFiltrees.length > 0 || this.optionTousVisible;
-          console.log('Membres du projet après ajout des administrateurs : ', this.membresProjet);
-          console.log('Administrateurs ajoutés aux membres du projet : ', administrateurs);
+         
         },
         error: (err) => {
           console.error('Erreur lors du chargement des administrateurs', err);

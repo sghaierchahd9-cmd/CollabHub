@@ -38,7 +38,7 @@ export class NotificationBellComponent {
   }
 
   toggleDropdown(event: MouseEvent): void {
-    event.stopPropagation(); // évite que le HostListener document:click referme aussitôt
+    event.stopPropagation(); 
     this.isOpen = !this.isOpen;
   }
 

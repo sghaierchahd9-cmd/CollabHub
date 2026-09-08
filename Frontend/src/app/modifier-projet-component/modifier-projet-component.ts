@@ -92,7 +92,7 @@ export class ModifierProjetComponent implements OnChanges {
       chefProjet: projet.chefProjet
     });
 
-    // collaborateurIds est déjà un number[]
+    
     this.membresSelectionnes = new Set(projet.collaborateurIds ?? []);
   }
 

@@ -30,7 +30,7 @@ export class ProjetCartComponent implements OnInit {
     this.projetService.getMembers(projetId).subscribe({
       next: (data) => {
         this.members = data.map((json) => Utilisateur.fromJson(json));
-        console.log('Members:', this.members);
+       
       },
       error: (err) => console.error(err),
     
@@ -68,7 +68,7 @@ export class ProjetCartComponent implements OnInit {
           let avancementSomme =0;
           taches.forEach(t => avancementSomme += Number(t.tauxAvancement));
           this.avancement = totalTaches > 0 ? Math.round((avancementSomme/ totalTaches) ) : 0;
-          console.log('Avancement:', this.avancement);
+         
         },
         error: (err) => console.error(err),
       });

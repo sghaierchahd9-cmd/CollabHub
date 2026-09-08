@@ -36,7 +36,7 @@ export class AddMembreComponent implements OnChanges ,OnInit{
     nouvelleEquipe.dateCreation = equipe.dateCreation;
     nouvelleEquipe.dateSupression = equipe.dateSupression;
     nouvelleEquipe.members = equipe.members.filter(m => !this.membresDejaAjoutes.includes(m.id) && m.id != this.chefId && m.role !='CHEF_PROJET');
-    console.log("membre déjà ajouté : ", this.membresDejaAjoutes);
+    
  
     return nouvelleEquipe; 
     });

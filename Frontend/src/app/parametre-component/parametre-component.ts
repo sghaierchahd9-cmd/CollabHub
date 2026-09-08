@@ -63,7 +63,7 @@ export class ParametreComponent implements OnDestroy,OnInit {
     this.prenom = user!.prenom;
     this.modeTravail = user!.modeTravail;
      this.photoProfilUrl = user!.photoProfilUrl ?? null;
-     console.log('Photo de profil initiale :', this.photoProfilUrl);
+   
     this.statutSelectionne = user!.statutActivite ?? StatutCollab.DISPONIBLE;
       this.notificationSocketService.souscrireStatutUtilisateur(this.userId);
   this.sub = this.notificationSocketService.statutRecu.subscribe(update => {

@@ -38,7 +38,7 @@ export class NotificationListComponent implements OnDestroy , OnInit {
     this.notificationHttpService.marquerCommeLue(id).subscribe({
       error: err => console.error('Erreur mark-as-read', err),
     });
-    this.onDismiss(id); // on ferme visuellement même si le PATCH est encore en vol
+    this.onDismiss(id); 
   }
 
 }

@@ -54,7 +54,7 @@ export class ProjetComponent {
     this.projetService.getProjet().subscribe(
       (data: Projet[]) => {
         this.projets = data.map(json => Projet.fromJson(json));
-        console.log('Projets fetched successfully:', this.projets);
+      
         this.selectedprojets = this.projets;
          this.statCartes.forEach(carte => {
           const statut = this.statutMap[carte.titre];
@@ -71,22 +71,19 @@ export class ProjetComponent {
 
   ngOnInit() {
       this.chargerProjet();
-      console.log('Projets after filtering:', this.projets);
-      console.log('selectedFiltre:', this.selectedFiltre);
-      console.log('connectedUser:', this.connectedUser);
+
       
     }
     selectFiltre(filtre: string): void {
       this.selectedFiltre = filtre;
       this.selectedprojets = filtre === 'Tous' ? this.projets : this.projets.filter(projet => projet.statut === this.statutMap[filtre]);
-      console.log('Projets after filtering:', this.projets);
-      console.log('selectedFiltre:', this.selectedFiltre);
+      
     }
 
 onActionButtonClick(event:any){
   if ((this.connectedUser.role === 'ADMINISTRATEUR') || (this.connectedUser.role === 'CHEF_PROJET') ){
     this.addProjet= true ;
-    console.log(this.addProjet);
+ 
       
 
   }

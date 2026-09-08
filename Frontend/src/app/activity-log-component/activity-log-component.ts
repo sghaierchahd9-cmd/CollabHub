@@ -24,7 +24,7 @@ export class ActivityLogComponent implements OnInit, OnChanges {
      this.activityService.getActivitiesParProjet(this.projetId).subscribe(
       (data)=>{
         this.activities=data.map(json=> Activity.fromjson(json));
-        console.log("acts : ",this.activities);
+       
 
       },
       (error)=>{console.log("une erreur est servenue");}

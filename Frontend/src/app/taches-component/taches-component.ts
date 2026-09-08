@@ -61,7 +61,7 @@ export class TachesComponent {
      }
    
    this.tachesemit.emit(this.taches);
-     console.log('Taches:', this.taches);
+   
     
     });
    

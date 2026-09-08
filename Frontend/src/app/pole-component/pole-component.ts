@@ -76,7 +76,7 @@ export class PoleComponent {
     return this.connectedUser?.role === 'ADMINISTRATEUR';
   }
 
-  // ---- membres éligibles pour un pôle donné (pas déjà dedans) ----
+  // ---- membres éligibles pour un pôle donné ----
   membresEligibles(equipe: Equipe): Utilisateur[] {
     const idsActuels = new Set(equipe.members.map(m => m.id));
     return this.tousLesUtilisateurs.filter(u => !idsActuels.has(u.id) && u.role !== "ADMINISTRATEUR");

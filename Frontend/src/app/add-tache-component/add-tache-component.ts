@@ -39,7 +39,7 @@ export class AddTacheComponent {
   dateMin: string;
 @Input() succes = false; 
  
-  private collaborateurs = new Set<Utilisateur>();
+  private collaborateursIds = new Set<number>();
 
   constructor(private fb: FormBuilder) {
     this.form = this.fb.group({
@@ -53,21 +53,20 @@ export class AddTacheComponent {
     this.dateMin = new Date().toISOString().split('T')[0]; // 'yyyy-MM-dd'
   }
 
-  toggleCollaborateur(collaborateur:Utilisateur): void {
-    if (this.collaborateurs.has(collaborateur)) {
-      this.collaborateurs.delete(collaborateur);
-    } else {
-      this.collaborateurs.add(collaborateur);
-    }
+ toggleCollaborateur(collaborateur: Utilisateur): void {
+  if (this.collaborateursIds.has(collaborateur.id)) {
+    this.collaborateursIds.delete(collaborateur.id);
+  } else {
+    this.collaborateursIds.add(collaborateur.id);
   }
+}
+estSelectionne(collaborateur: Utilisateur): boolean {
+  return this.collaborateursIds.has(collaborateur.id);
+}
 
-  estSelectionne(collaborateur: Utilisateur): boolean {
-    return this.collaborateurs.has(collaborateur);
-  }
-
-  get aucunCollaborateurSelectionne(): boolean {
-    return this.collaborateurs.size === 0;
-  }
+get aucunCollaborateurSelectionne(): boolean {
+  return this.collaborateursIds.size === 0;
+}
 
   initiales(u: Utilisateur): string {
     return `${u.prenom?.[0] ?? ''}${u.nom?.[0] ?? ''}`.toUpperCase();
@@ -83,22 +82,22 @@ export class AddTacheComponent {
   }
 
   onSubmit(): void {
-    this.form.markAllAsTouched();
+  this.form.markAllAsTouched();
 
-  
-    if (this.form.invalid || this.aucunCollaborateurSelectionne) {
-      return;
-    }
-
-    const requete: Tache = {
-      ...this.form.value,
-      dateDebut: null,
-      projetId: this.projetId,
-      collaborateurs: Array.from(this.collaborateurs)
-    };
-   console.log(requete);
-    this.tacheCreee.emit(requete);
+  if (this.form.invalid || this.aucunCollaborateurSelectionne) {
+    return;
   }
+
+  const collaborateursSelectionnes = this.equipeProjet.filter(u => this.collaborateursIds.has(u.id));
+
+  const requete: Tache = {
+    ...this.form.value,
+    dateDebut: null,
+    projetId: this.projetId,
+    collaborateurs: collaborateursSelectionnes
+  };
+  this.tacheCreee.emit(requete);
+}
 
   onAnnuler(): void {
     this.fermer.emit();

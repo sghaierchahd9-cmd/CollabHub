@@ -69,15 +69,24 @@ export class ModifierProjetComponent implements OnChanges {
      )
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    this.equipes.forEach(e=>
-      e.members=e.members.filter(m => m.role != "CHEF_PROJET")
-    )
+
+ngOnChanges(changes: SimpleChanges): void {
+    this.equipesFiltrees = this.equipes.map(equipe => {
+      const copie = new Equipe();
+      copie.id = equipe.id;
+      copie.nom = equipe.nom;
+      copie.description = equipe.description;
+      copie.dateCreation = equipe.dateCreation;
+      copie.dateSupression = equipe.dateSupression;
+      copie.members = equipe.members.filter(m => m.role !== 'CHEF_PROJET');
+      return copie;
+    });
+
     // Pré-remplissage uniquement à l'ouverture
     if (changes['isOpen'] && this.isOpen && this.projet) {
       this.preRemplirFormulaire(this.projet);
     }
-  }
+}
 
   private preRemplirFormulaire(projet: Projet): void {
     this.form.reset();

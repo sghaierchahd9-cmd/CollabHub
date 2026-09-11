@@ -4,6 +4,7 @@ import { Subject } from 'rxjs';
 import { Notification } from './Model/Notification';
 import { Commentaire } from './Model/Commentaire';
 import { StatutUpdate } from './Model/StatutUpdate';
+import { Tache } from './Model/tache';
 
 @Injectable({ providedIn: 'root' })
 export class NotificationSocketService {
@@ -15,14 +16,18 @@ export class NotificationSocketService {
   private commentaireRecue$ = new Subject<{ tacheId: number; commentaire: Commentaire }>();
   public commentaireRecue = this.commentaireRecue$.asObservable();
 
-  // --- Commentaires projet : nouveau, même pattern, map/subject dédiés ---
+  // --- Commentaires projet : nouveau , map/subject dédiés ---
   private commentaireProjetSubs = new Map<number, StompSubscription>();
   private commentaireProjetRecue$ = new Subject<{ projetId: number; commentaire: Commentaire }>();
   public commentaireProjetRecue = this.commentaireProjetRecue$.asObservable();
-
+  // --- Statut utilisateur : nouveau , map/subject dédiés ---
   private statutSubs = new Map<number, StompSubscription>();
   private statutRecu$ = new Subject<StatutUpdate>();
   public statutRecu = this.statutRecu$.asObservable();
+  // --- Taches projet : nouveau , map/subject dédiés ---
+  private tacheProjetSubs = new Map<number, StompSubscription>();
+  private tacheProjetRecue$ = new Subject<{ projetId: number; tache: Tache }>();
+  public tacheProjetRecue = this.tacheProjetRecue$.asObservable();
 
   private reconnexion$ = new Subject<void>();
   public reconnexion = this.reconnexion$.asObservable();
@@ -55,8 +60,11 @@ export class NotificationSocketService {
 
           this.reconnexion$.next();
         }
+        const tachesAbonnees = [...this.tacheProjetSubs.keys()];
+        this.tacheProjetSubs.clear();
+        tachesAbonnees.forEach(id => this.souscrireTachesProjet(id));
         this.dejaConnecteUneFois = true;
-        console.log(' STOMP CONNECT réussi');
+
       },
       onStompError: (frame) => {
         console.error('Erreur STOMP :', frame.headers['message']);
@@ -80,6 +88,24 @@ export class NotificationSocketService {
   desouscrireCommentairesTache(tacheId: number): void {
     this.commentaireSubs.get(tacheId)?.unsubscribe();
     this.commentaireSubs.delete(tacheId);
+  }
+  souscrireTachesProjet(projetId: number): void {
+    if (!this.client?.connected) {
+      console.warn('WebSocket non connecté, abonnement taches projet ignoré');
+      return;
+    }
+    if (this.tacheProjetSubs.has(projetId)) return;
+
+    const sub = this.client.subscribe(`/topic/projets/${projetId}/taches`, (message: IMessage) => {
+      const tache = Tache.fromJson(JSON.parse(message.body));
+      this.tacheProjetRecue$.next({ projetId, tache });
+    });
+    this.tacheProjetSubs.set(projetId, sub);
+  }
+
+  desouscrireTachesProjet(projetId: number): void {
+    this.tacheProjetSubs.get(projetId)?.unsubscribe();
+    this.tacheProjetSubs.delete(projetId);
   }
 
   // --- Commentaires projet : nouvelles méthodes, même pattern ---
@@ -129,7 +155,11 @@ export class NotificationSocketService {
     this.statutSubs.forEach(sub => sub.unsubscribe());
     this.statutSubs.clear();
     this.dejaConnecteUneFois = false;
+    this.tacheProjetSubs.forEach(sub => sub.unsubscribe());
+    this.tacheProjetSubs.clear();
     this.client?.deactivate();
+
     this.client = null;
+
   }
 }

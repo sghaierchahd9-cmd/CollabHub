@@ -1,5 +1,5 @@
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Projet } from '../Model/Projet';
 import { Input } from '@angular/core';
 import { HeaderComponent } from '../header-component/header-component';
@@ -44,7 +44,7 @@ import { HttpErrorResponse } from '@angular/common/http';
   templateUrl: './projet-detail-component.html',
   styleUrl: './projet-detail-component.css',
 })
-export class ProjetDetailComponent implements OnInit {
+export class ProjetDetailComponent implements OnInit ,OnDestroy {
   projet!: Projet;
   connectedUser: Utilisateur | null;
   ChefProjet: Utilisateur | null = null;
@@ -118,6 +118,8 @@ export class ProjetDetailComponent implements OnInit {
   enregistrementAvancementEnCours = false;
   erreurAvancement: string | null = null;
   private subNotif?: Subscription;
+  private subNouvelleTache?: Subscription;
+
   constructor(private projetService: ProjetService, private router: ActivatedRoute,
     private loginService: LoginService, private utilisateurService: UtilisateurService,
     private tacheService: TacheService,
@@ -199,6 +201,13 @@ export class ProjetDetailComponent implements OnInit {
             this.chargerTaches();
           }
         });
+        this.notificationSocketService.souscrireTachesProjet(this.projet.id);
+this.subNouvelleTache = this.notificationSocketService.tacheProjetRecue.subscribe(({ projetId }) => {
+  if (projetId === this.projet.id) {
+    this.chargerTaches();
+  }
+});
+
 
         this.equipeService.getequipes().subscribe({
           next: data => {
@@ -233,6 +242,7 @@ this.notificationSocketService.statutRecu.subscribe(update => {
     membre.statutActivite = update.statut;
   }
 });
+
 
 
   }
@@ -425,4 +435,12 @@ this.notificationSocketService.statutRecu.subscribe(update => {
     this.afficheInfoTache=true;
     
   }
+
+  ngOnDestroy(): void {
+  this.subNotif?.unsubscribe();
+  this.subNouvelleTache?.unsubscribe();
+  if (this.projet) {
+    this.notificationSocketService.desouscrireTachesProjet(this.projet.id);
+  }
+}
 }

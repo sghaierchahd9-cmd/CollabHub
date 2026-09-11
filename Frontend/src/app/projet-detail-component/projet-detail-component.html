@@ -172,7 +172,7 @@
       (fermer)="onFermerModalAvancement()" (enregistrer)="onEnregistrerAvancement($event)">
 
     </app-mettre-ajour-avancement-component>
-    <app-tache-detail-component [isOpen]="ouvreDetailTache" [membresProjet]="collaborateurs" [tache]="tacheSelectionnee"
+    <app-tache-detail-component [isOpen]="ouvreDetailTache" [membresProjet]="collaborateurs.concat(ChefProjet ? [ChefProjet] : [])" [tache]="tacheSelectionnee"
       (fermer)="ouvreDetailTache=false"></app-tache-detail-component>
     <app-pieces-jointes-modal-component *ngIf="afficherModalPiecesJointes && tacheSelectionnee"
       [tacheId]="tacheSelectionnee.id" (fermer)="afficherModalPiecesJointes = false">

@@ -87,7 +87,8 @@ La structure est **matricielle** :
 ```mermaid
 graph TB
     subgraph Client["Client — Angular"]
-        A["Angular App<br/>Composants standalone + Tailwind CSS + Angular CDK"]
+        A["Angular App<br/>Composants standalone
++ Tailwind CSS + Angular CDK"]
     end
 
     subgraph Server["Serveur — Spring Boot"]

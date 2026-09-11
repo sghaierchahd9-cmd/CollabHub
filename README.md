@@ -4,6 +4,7 @@
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=flat&logo=postgresql&logoColor=white)
 ![WebSocket](https://img.shields.io/badge/WebSocket-STOMP-blue)
 ![License](https://img.shields.io/badge/statut-projet%20de%20stage-lightgrey)
+
 **CollabHub** est une plateforme web de gestion collaborative de projets, développée dans le cadre d'un stage. Elle permet à une organisation de structurer ses équipes en pôles, de piloter des projets et des tâches en mode Kanban, et de collaborer en temps réel (commentaires, mentions, notifications, pièces jointes).
 ## Sommaire
 

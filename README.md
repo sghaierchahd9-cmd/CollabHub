@@ -96,7 +96,9 @@ graph TB
         SEC["Spring Security<br/>Filtre JWT"]
         CTRL["Contrôleurs REST"]
         SRV["Services métier"]
-        WS["WebSocket / STOMP<br/>(notifications, commentaires, statuts)"]
+        WS["WebSocket / STOMP<br/>(notifications
+, commentaires,
+ statuts)"]
     end
 
     DB[("PostgreSQL")]

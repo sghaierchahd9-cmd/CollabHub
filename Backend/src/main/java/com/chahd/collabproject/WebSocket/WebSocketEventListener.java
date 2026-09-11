@@ -2,6 +2,7 @@ package com.chahd.collabproject.WebSocket;
 
 import com.chahd.collabproject.DTO.StatutUpdateMessage;
 import com.chahd.collabproject.Enum.StatutCollab;
+import com.chahd.collabproject.Event.UtilisateurSuppressionEvent;
 import com.chahd.collabproject.entity.Utilisateur;
 import com.chahd.collabproject.repository.UtilisateurRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ public class WebSocketEventListener {
 
     private final UtilisateurRepository utilisateurRepository;
     private final SimpMessagingTemplate messagingTemplate;
+    private final WebSocketSessionRegistry sessionRegistry;
 
     private final Map<Integer, Set<String>> sessionsParUtilisateur = new ConcurrentHashMap<>();
 
@@ -91,5 +93,25 @@ public class WebSocketEventListener {
 
     public boolean estConnecte(int utilisateurId) {
         return sessionsParUtilisateur.containsKey(utilisateurId);
+    }
+    public void deconnecterToutesLesSessions(int utilisateurId) {
+        Set<String> sessionIds = sessionsParUtilisateur.get(utilisateurId);
+        if (sessionIds == null) return;
+
+        for (String sessionId : new java.util.HashSet<>(sessionIds)) {
+            var session = sessionRegistry.getSession(sessionId);
+            if (session != null && session.isOpen()) {
+                try {
+                    session.close(org.springframework.web.socket.CloseStatus.POLICY_VIOLATION.withReason("Compte suspendu"));
+                } catch (java.io.IOException e) {
+                    // best effort : on ne bloque jamais la suspension pour un souci réseau
+                }
+            }
+        }
+    }
+    @EventListener
+    public void onUtilisateurSupprime(UtilisateurSuppressionEvent event) {
+        int id = event.getUtilisateurId();
+        deconnecterToutesLesSessions(id);
     }
 }

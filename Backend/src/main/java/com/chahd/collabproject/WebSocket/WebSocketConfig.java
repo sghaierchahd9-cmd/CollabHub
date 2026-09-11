@@ -13,7 +13,7 @@ import org.springframework.web.socket.config.annotation.*;
 @RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     private final JwtHandshakeChannelInterceptor jwtHandshakeChannelInterceptor;
-
+    private final WebSocketSessionDecorator webSocketSessionDecoratorFactory;
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         registry.enableSimpleBroker("/queue", "/topic");
@@ -30,5 +30,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
         registration.interceptors(jwtHandshakeChannelInterceptor);
+    }
+    @Override
+    public void configureWebSocketTransport(WebSocketTransportRegistration registration) {
+        registration.addDecoratorFactory(webSocketSessionDecoratorFactory);
     }
 }

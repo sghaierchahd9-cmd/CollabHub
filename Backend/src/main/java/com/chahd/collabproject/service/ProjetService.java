@@ -12,6 +12,8 @@ import com.chahd.collabproject.repository.MembreProjetRepository;
 import com.chahd.collabproject.repository.ProjetRepository;
 import com.chahd.collabproject.repository.UtilisateurRepository;
 import jakarta.persistence.EntityNotFoundException;
+
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -32,7 +34,7 @@ public class ProjetService {
         private final NotificationService notificationService;
         public ProjetService(ProjetRepository projetRepository, UtilisateurRepository utilisateurRepository,
                              ActivityLogRepository activityLogRepository, MembreProjetRepository membreProjetRepository,
-                             NotificationService notificationService) {
+                             @Lazy NotificationService notificationService) {
             this.projetRepository = projetRepository;
             this.utilisateurRepository = utilisateurRepository;
             this.activityLogRepository = activityLogRepository;

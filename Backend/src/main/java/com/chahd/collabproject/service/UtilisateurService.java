@@ -2,17 +2,18 @@ package com.chahd.collabproject.service;
 
 import com.chahd.collabproject.DTO.CreationUtilisateurRequest;
 import com.chahd.collabproject.DTO.UtilisateurDTO;
+import com.chahd.collabproject.Enum.StatutCollab;
+import com.chahd.collabproject.Event.UtilisateurSuppressionEvent;
 import com.chahd.collabproject.Exceptions.EmailDejaExistantException;
-import com.chahd.collabproject.entity.Equipe;
-import com.chahd.collabproject.entity.MembrePole;
-import com.chahd.collabproject.entity.Projet;
-import com.chahd.collabproject.entity.Utilisateur;
+import com.chahd.collabproject.WebSocket.WebSocketEventListener;
+import com.chahd.collabproject.entity.*;
 import com.chahd.collabproject.repository.*;
 
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -35,13 +36,15 @@ public class UtilisateurService {
     private final MembreProjetRepository membreProjetRepository;
     private final MotDePasseGenerator motDePasseGenerator;
     private final EmailService emailService;
-
+    private final ApplicationEventPublisher eventPublisher;
     public UtilisateurService(UtilisateurRepository utilisateurRepository, ProjetService projetService,
                               ProjetRepository projetRepository,
                               TacheRepository tacheRepository, EquipeRepository equipeRepository,
                               MembrePoleRepository membrePoleRepository, PasswordEncoder passwordEncoder,
                               MembreProjetRepository membreProjetRepository,
-                              MotDePasseGenerator motDePasseGenerator, EmailService emailService) {
+                              MotDePasseGenerator motDePasseGenerator, EmailService emailService,
+                              ApplicationEventPublisher eventPublisher
+                             ) {
         this.utilisateurRepo=utilisateurRepository;
         this.projetService=projetService;
         this.projetRepository=projetRepository;
@@ -52,6 +55,8 @@ public class UtilisateurService {
         this.membreProjetRepository = membreProjetRepository;
         this.motDePasseGenerator= motDePasseGenerator;
         this.emailService=emailService;
+        this.eventPublisher=eventPublisher;
+
     }
     public Optional<Utilisateur> loginUtilisateur(String email){
         return  this.utilisateurRepo.findByEmail(email);
@@ -124,6 +129,7 @@ public class UtilisateurService {
         utilisateur.setModeTravail(request.getModeTravail());
         utilisateur.setDateCreation(OffsetDateTime.now());
         utilisateur = utilisateurRepo.save(utilisateur);
+        utilisateur.setStatutActivite(StatutCollab.HORS_LIGNE);
         affecterPoles(utilisateur, request.getEquipeIds());
 
         emailService.sendEmail(utilisateur, motDePasseClair);
@@ -136,7 +142,16 @@ public void supprimer(int id){
     for(MembrePole mp : utilisateur.getMembresPoles()) {
         mp.setDateSuppression(OffsetDateTime.now());
     }
+
+    for (MembreProjet mp : utilisateur.getMembresProjet()) {
+        mp.setDateSuppression(OffsetDateTime.now());
+    }
+    for(AffectationTache af : utilisateur.getAffectationsTaches()){
+        af.setDateSuppression(OffsetDateTime.now());
+    }
     utilisateurRepo.save(utilisateur);
+    eventPublisher.publishEvent(new UtilisateurSuppressionEvent(this, id));
+
 }
     // UtilisateurService.java
     @Transactional(readOnly = true)

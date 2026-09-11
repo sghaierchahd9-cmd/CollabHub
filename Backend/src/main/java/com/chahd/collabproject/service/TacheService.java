@@ -9,6 +9,7 @@ import com.chahd.collabproject.repository.*;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,7 +31,8 @@ public class TacheService {
     private final ActivityLogRepository activityLogRepository;
     public final ProjetRepository projetRepo;
     private final AffectationTacheRepository affectationTacheRepo;
-    private final NotificationService notificationService;// AJOUT
+    private final NotificationService notificationService;
+    private final SimpMessagingTemplate simpMessagingTemplate;
 
 
 
@@ -93,7 +95,12 @@ public class TacheService {
         log.setDateEvenement(LocalDateTime.now());
         activityLogRepository.save(log);
 
-        return TacheDTO.fromTache(saved);
+        TacheDTO dto = TacheDTO.fromTache(saved);
+        simpMessagingTemplate.convertAndSend(
+                "/topic/projets/" + saved.getProjet().getId() + "/taches",
+                dto
+        );
+        return dto;
     }
 
     // modifierStatutTache : inchangé, ne touche pas aux collaborateurs
@@ -183,7 +190,12 @@ public class TacheService {
         log.setDateEvenement(LocalDateTime.now());
         activityLogRepository.save(log);
 
-        return TacheDTO.fromTache(tache);
+        TacheDTO new_dto = TacheDTO.fromTache(tache);
+        simpMessagingTemplate.convertAndSend(
+                "/topic/projets/" + tache.getProjet().getId() + "/taches",
+                new_dto
+        );
+        return new_dto;
     }
 
     public List<TacheDTO> getTachesParMembreEtProjet(int projetId, int membreId, Utilisateur acteur) {
@@ -209,7 +221,12 @@ public class TacheService {
         tache.setTauxAvancement(tauxAvancement);
         Tache tacheMiseAJour = tacheRepo.save(tache);
 
-        return TacheDTO.fromTache(tacheMiseAJour);
+        TacheDTO new_dto = TacheDTO.fromTache(tacheMiseAJour);
+        simpMessagingTemplate.convertAndSend(
+                "/topic/projets/" + tache.getProjet().getId() + "/taches",
+                new_dto
+        );
+        return new_dto;
     }
 
     private void verifierDroitModificationAvancement(Tache tache, Utilisateur utilisateur) {
@@ -254,6 +271,11 @@ public class TacheService {
         log.setDateEvenement(LocalDateTime.now());
         activityLogRepository.save(log);
 
+
+        simpMessagingTemplate.convertAndSend(
+                "/topic/projets/" + tache.getProjet().getId() + "/taches",
+                TacheDTO.fromTache(tache)
+        );
         return tache;
     }
 

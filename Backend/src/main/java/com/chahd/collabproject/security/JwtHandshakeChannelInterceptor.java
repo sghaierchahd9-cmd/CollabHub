@@ -8,6 +8,7 @@ import com.chahd.collabproject.repository.TacheRepository;
 import com.chahd.collabproject.repository.UtilisateurRepository;
 import com.chahd.collabproject.service.UtilisateurService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;

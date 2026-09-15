@@ -1,0 +1,33 @@
+<!-- resume-ia-component.html -->
+<div class="bg-white rounded-2xl shadow-sm border border-gray-100 px-6 py-5">
+
+  <div class="flex items-center justify-between mb-4">
+    <h3 class="text-base font-semibold text-gray-900 flex items-center gap-2">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+      </svg>
+      Résumé IA de l'activité
+    </h3>
+    <button type="button" (click)="regenerer()" [disabled]="chargement"
+      class="px-3 py-1.5 rounded-lg border border-gray-200 text-xs font-semibold text-[#3a7ca5] hover:bg-[#f0f7fb] disabled:opacity-50 flex items-center gap-1.5">
+      <svg *ngIf="chargement" class="h-3.5 w-3.5 animate-spin" viewBox="0 0 24 24" fill="none">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+      </svg>
+      {{ chargement ? 'Génération...' : 'Régénérer' }}
+    </button>
+  </div>
+
+  <p *ngIf="erreur" class="text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">
+    {{ erreur }}
+  </p>
+
+  <p *ngIf="!erreur && chargement && !contenu" class="text-sm text-gray-400">
+    Génération du résumé en cours...
+  </p>
+
+  <p *ngIf="!erreur && contenu" class="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
+    {{ contenu }}
+  </p>
+
+</div>

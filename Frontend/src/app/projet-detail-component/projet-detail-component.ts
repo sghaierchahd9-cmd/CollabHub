@@ -37,10 +37,11 @@ import { NotificationSocketService } from '../notification-socket-service';
 import { EspaceCollaboratifProjetComponent } from "../espace-collaboratif-projet-component/espace-collaboratif-projet-component";
 import { TacheInfrmationComponent } from "../tache-infrmation-component/tache-infrmation-component";
 import { HttpErrorResponse } from '@angular/common/http';
+import { ResumeIaComponent } from "../resume-ia-component/resume-ia-component";
 
 @Component({
   selector: 'app-projet-detail-component',
-  imports: [HeaderComponent, NgStyle, CommonModule, StatCartComponent, AddMembreComponent, KanbanComponent, AddTacheComponent, NgClass, CarteMenmbreComponent, RepartitionTacheChartComponent, ActivityLogComponent, ModifieTacheComponent, DetailMembreProjetComponent, ModifierProjetComponent, MettreAjourAvancementComponent, TacheDetailComponent, PiecesJointesModalComponent, EspaceCollaboratifProjetComponent, TacheInfrmationComponent],
+  imports: [HeaderComponent, NgStyle, CommonModule, StatCartComponent, AddMembreComponent, KanbanComponent, AddTacheComponent, NgClass, CarteMenmbreComponent, RepartitionTacheChartComponent, ActivityLogComponent, ModifieTacheComponent, DetailMembreProjetComponent, ModifierProjetComponent, MettreAjourAvancementComponent, TacheDetailComponent, PiecesJointesModalComponent, EspaceCollaboratifProjetComponent, TacheInfrmationComponent, ResumeIaComponent],
   templateUrl: './projet-detail-component.html',
   styleUrl: './projet-detail-component.css',
 })

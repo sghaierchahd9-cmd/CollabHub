@@ -97,6 +97,15 @@
       </svg>
       Discussion
     </button>
+    <button
+  class="px-[18px] py-2.5 border-b-2 bg-none cursor-pointer font-['Inter',sans-serif] text-sm transition-colors duration-150 whitespace-nowrap flex items-center gap-1.5"
+  [ngClass]="selectedFiltre === 'ResumeIA' ? 'font-semibold text-[#3a7ca5] border-[#3a7ca5]' :'border-transparent font-normal text-[#6b7f8e]'"
+  (click)="selectedFiltre='ResumeIA'">
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+  </svg>
+  Résumé IA
+</button>
   
   </div>
 
@@ -151,6 +160,9 @@
         [title]="'Répartition des taches'"></app-repartition-tache-chart-component>
       <app-activity-log-component [projetId]="projet.id"></app-activity-log-component>
     </div>
+    <ng-container *ngIf="selectedFiltre === 'ResumeIA'">
+  <app-resume-ia-component [projetId]="projet.id"></app-resume-ia-component>
+</ng-container>
     
   
     <app-add-tache-component *ngIf="afficherModalTache" [equipeProjet]="collaborateurs" [projetId]="projet.id"

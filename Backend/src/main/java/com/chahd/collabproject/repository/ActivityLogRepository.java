@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface ActivityLogRepository extends JpaRepository<ActivityLog, Integer> {
     List<ActivityLog> findTop5ByProjetIdOrderByDateEvenementDesc(int projetId);
+    List<ActivityLog> findTop20ByProjetIdOrderByDateEvenementDesc(int projetId);
 }

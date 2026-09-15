@@ -8,5 +8,6 @@ import java.util.List;
 public interface CommentaireRepository extends JpaRepository<Commentaire,Integer> {
     List<Commentaire> findByTacheIdAndParentIsNullAndDateSuppressionIsNullOrderByDateCreationAsc(Integer tacheId);
     List<Commentaire> findByProjetIdAndTacheIdIsNullAndDateSuppressionIsNull(Integer projetId);
+    List<Commentaire> findTop20ByProjetIdAndDateSuppressionIsNullOrderByDateCreationDesc(Integer projetId);
 
 }

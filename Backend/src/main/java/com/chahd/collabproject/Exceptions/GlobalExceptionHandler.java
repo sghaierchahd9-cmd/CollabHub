@@ -53,4 +53,9 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(Map.of("message", "Une erreur inattendue est survenue."));
     }
+    @ExceptionHandler(ResumeIaIndisponibleException.class)
+    public ResponseEntity<Map<String, String>> handleResumeIaIndisponible(ResumeIaIndisponibleException ex) {
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                .body(Map.of("message", ex.getMessage()));
+    }
 }

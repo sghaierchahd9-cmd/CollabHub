@@ -29,6 +29,7 @@ CollabHub couvre le cycle de vie complet d'un projet :
 - **Pièces jointes** par tâche
 - **Tableau de bord** avec statistiques (avancement, répartition par statut, activité mensuelle)
 - Gestion sécurisée des comptes (création par un administrateur, mot de passe temporaire envoyé par email, réinitialisation de mot de passe)
+- Résumé d'activité généré par IA pour chaque projet, à destination des chefs de projet
 
 ---
 ## Fonctionnalités
@@ -49,6 +50,11 @@ CollabHub couvre le cycle de vie complet d'un projet :
 - Espace de discussion par projet et par tâche : commentaires filetés (réponses imbriquées), mentions (`@utilisateur` ou `@tous`)
 - Notifications en temps réel (WebSocket/STOMP) et notifications persistées, avec toasts et centre de notifications
 - Statut de présence en direct (disponible, en réunion, en pause, hors ligne), mis à jour automatiquement à la connexion/déconnexion
+- ### Résumé IA
+- Génération d'un résumé synthétique de l'activité récente d'un projet (tâches créées/modifiées, ajouts/retraits de membres, commentaires notables), à destination d'un chef de projet pressé
+- Le résumé est mis en cache en base (table `resume_ia`) et n'est régénéré qu'à la demande explicite de l'utilisateur, pour limiter les appels au fournisseur IA
+- Génération basée sur l'API **Groq** (modèle `llama-3.3-70b-versatile`), consommée via un prompt système + un prompt utilisateur construits à partir des 20 derniers événements (`ActivityLog`) et commentaires du projet
+- Accès restreint aux membres du projet (administrateur, chef de projet du projet concerné, ou collaborateur affecté), avec message d'indisponibilité dédié si le service IA ne répond pas
 
 ### Fichiers
 - Upload, téléchargement, renommage et suppression de pièces jointes par tâche
@@ -124,6 +130,7 @@ graph TB
 
 ## Modèle de données (simplifié)
 
+
 ```mermaid
 erDiagram
     UTILISATEUR ||--o{ MEMBRE_POLE : appartient
@@ -140,7 +147,9 @@ erDiagram
     UTILISATEUR ||--o{ PIECEJOINTE : dépose
     UTILISATEUR ||--o{ NOTIFICATION : reçoit
     PROJET ||--o{ ACTIVITY_LOG : journalise
+    PROJET ||--o| RESUME_IA : possède
 ```
+
 
 Toutes les entités possèdent `date_creation` et `date_suppression` (soft delete), omises ici pour la lisibilité.
 
@@ -155,6 +164,7 @@ Toutes les entités possèdent `date_creation` et `date_suppression` (soft delet
 | Base de données | PostgreSQL |
 | Temps réel | WebSocket natif + protocole STOMP |
 | Emails | Gmail SMTP (création de compte, réinitialisation de mot de passe) |
+| IA | API Groq (modèle `llama-3.3-70b-versatile`) pour le résumé d'activité de projet |
 | Outils | IntelliJ IDEA, GitHub |
 
 ---
@@ -178,6 +188,9 @@ Le backend attend les variables suivantes (à définir dans la configuration d'e
 | `JWT_EXPIRATION` | Durée de validité du token (ms) |
 | `SPRING_MAIL_USERNAME` / `SPRING_MAIL_PASSWORD` | Identifiants SMTP (Gmail) |
 | `APP_UPLOAD_DIR` / `APP_UPLOAD_DIR_PROFILS` | Répertoires de stockage des fichiers et photos de profil |
+| `GROQ_API_KEY` | Clé d'API du fournisseur Groq, utilisée pour authentifier les appels de génération de résumé |
+| `GROQ_API_URL` | URL de l'endpoint Groq (API compatible OpenAI) appelé pour générer le résumé |
+| `GROQ_API_MODEL` | Nom du modèle Groq utilisé (ex. `llama-3.3-70b-versatile`) |
 
 
 ### Lancer le backend
@@ -207,6 +220,7 @@ Ces points sont assumés et documentés en connaissance de cause :
 
 - **Pièces jointes** : aucune restriction de type de fichier côté serveur (choix assumé, le périmètre incluant potentiellement des fichiers exécutables dans un contexte professionnel) ; la limite de taille n'est vérifiée que côté client.
 - **Renommage de pièce jointe** : ne permet de changer que le nom, pas l'extension ni le format du fichier.
+-  **Résumé IA** : dépend de la disponibilité du fournisseur externe (Groq) ; en cas d'indisponibilité, un message d'erreur dédié est renvoyé plutôt qu'un résumé de repli.
 
 ---
 

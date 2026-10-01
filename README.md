@@ -34,7 +34,7 @@ CollabHub couvre le cycle de vie complet d'un projet :
 ---
 ## Fonctionnalités
 
-![Diagramme de cas d'utilisation](docs/use-case-global.png)
+![Diagramme de cas d'utilisation](docs/use_case_global.png)
 
 ### Gestion de projets & tâches
 - Création, modification, suivi d'avancement des projets (statut, priorité, échéance)

@@ -113,6 +113,16 @@ export class FormAjoutProjet implements OnInit {
 
   fermerForm(): void {
     this.isClosed.emit();
+     this.form = this.fb.group({
+      nom: ['', [Validators.required, Validators.minLength(3)]],
+      description: [''],
+      objectifs: [''],
+      dateDebut: ['', Validators.required],
+      dateFinPrevue: ['', Validators.required],
+      niveauPriorite: ['Moyenne', Validators.required],
+      statut: ['Planifié', Validators.required],
+      chefProjet: [this.loggedinPerson?.role === 'CHEF_PROJET' ? this.loggedinPerson.id :null, Validators.required],
+    });
   }
 
   soumettre(): void {
@@ -126,8 +136,18 @@ export class FormAjoutProjet implements OnInit {
       ...this.form.value,                                
       collaborateurIds: Array.from(this.membresSelectionnes),
     };
-    console.log('payload : ', payload);
+    
     this.projetCree.emit(payload);
+     this.form = this.fb.group({
+      nom: ['', [Validators.required, Validators.minLength(3)]],
+      description: [''],
+      objectifs: [''],
+      dateDebut: ['', Validators.required],
+      dateFinPrevue: ['', Validators.required],
+      niveauPriorite: ['Moyenne', Validators.required],
+      statut: ['Planifié', Validators.required],
+      chefProjet: [this.loggedinPerson?.role === 'CHEF_PROJET' ? this.loggedinPerson.id :null, Validators.required],
+    });
   
     
   }

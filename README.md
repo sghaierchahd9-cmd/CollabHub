@@ -33,6 +33,7 @@ CollabHub couvre le cycle de vie complet d'un projet :
 
 ---
 ## Fonctionnalités
+### Diagramme de cas d'utilisation
 
 ![Diagramme de cas d'utilisation](docs/use_case_global.png)
 
